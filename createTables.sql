@@ -32,7 +32,7 @@ CREATE TABLE Game (
   avg_rating FLOAT DEFAULT NULL,
   title VARCHAR(255),
   release_date DATE,
-  unit_price INT
+  unit_price DECIMAL(4,2)
 );
 
 CREATE TABLE Auctions (
