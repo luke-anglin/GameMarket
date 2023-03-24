@@ -1,5 +1,5 @@
 -- SQL commands to create all tables
-CREATE TABLE 'User' (
+CREATE TABLE User (
     user_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
