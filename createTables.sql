@@ -14,13 +14,13 @@ CREATE TABLE UserEmail (
 );
 
 CREATE TABLE UserPhone (
-    phone_number INT PRIMARY KEY,
+    phone_number BIGINT PRIMARY KEY,
     user_id INT,
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
 CREATE TABLE UserPayment (
-    card_number INT PRIMARY KEY,
+    card_number BIGINT PRIMARY KEY,
     card_type VARCHAR(30),
     user_id INT,
     FOREIGN KEY (user_id) REFERENCES User(user_id)
