@@ -38,7 +38,7 @@ CREATE TABLE Game (
 CREATE TABLE Auctions (
     auction_id INT PRIMARY KEY AUTO_INCREMENT,
     price FLOAT,
-    stock INT
+    stock INT DEFAULT NULL
 );
 
 CREATE TABLE Reviews (
