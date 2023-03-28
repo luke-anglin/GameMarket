@@ -44,10 +44,11 @@
 
 <!-- Connect to database -->
 <?php require "connect.php" ?>
-
-<script src = "connect.js"></script>
 <!-- Content goes here -->
 
+<script>
+  connect();
+</script>
 <h2>Featured Games</h2>
 <!-- Select just a few of the games in the Game table here and display their price and title -->
 <?php 

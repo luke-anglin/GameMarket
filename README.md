@@ -15,6 +15,12 @@ module load node-js-16.13.0
 npm install
 ```
 
+## Browserify note to myself 
+
+```
+node node_modules/browserify/bin/cmd.js app.js -o bundle.js // if need more modules 
+```
+
 
 # Tables for Reference
 ```sql
