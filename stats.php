@@ -59,62 +59,127 @@
 $u_id = 1; # replace with global user id from login
 ?>
 
+<!-- Button Actions -->
+<?php
+if ($_SERVER['REQUEST_METHOD'] == 'POST')
+{
+  if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "X"))
+  {
+    deleteEmail($_POST['delete_email']);
+    $email = getUserEmail($u_id);
+  }
+  else if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "✓"))
+  {
+    addEmail($_POST['newEmail'], $u_id);
+    $email = getUserEmail($u_id);
+  }
+  else if (!empty($_POST['phoneBtn']) && ($_POST['phoneBtn'] == "X"))
+  {
+    deletePhone($_POST['delete_phone']);
+    $phone = getUserPhone($u_id);
+  }
+  else if (!empty($_POST['phoneBtn']) && ($_POST['phoneBtn'] == "✓"))
+  {
+    addPhone($_POST['newPhone'], $u_id);
+    $phone = getUserPhone($u_id);
+  }
+}
+?>
+
+<!-- Top Section: Account Info -->
 <div style="width:95%;border:0.5px solid #000;margin:0 auto;border-radius:10px;background-color:#D3D3D3">
   <h3 style="padding-left:18px;padding-top:5px">Account Info</h3>
   <div style="padding-left:30px;padding-bottom:5px">
 
+    <!-- Get Account Info -->
     <?php $info = getUserInfo($u_id)?>
     <?php $email = getUserEmail($u_id)?>
     <?php $phone = getUserPhone($u_id)?>
 
+    <!-- Display Account Info -->
     <?php foreach ($info as $user_info): ?>
       Username: <?php echo $user_info["username"]?> <br>
       First Name: <?php echo $user_info["first_name"]?> <br>
       Last Name: <?php echo $user_info["last_name"]?> <br>
     <?php endforeach; ?>
 
+    <!-- Side-by-Side Table Style -->
     <style>
     .table-container {
       display: flex;
       justify-content: center;
-      gap: 10px;
+      gap: 5%;
+      padding-right:30px;
     }
     table {
       border: 1px solid black;
       border-collapse: collapse;
-      width: 30%;
+      width: 50%;
     }
-    th, td {
-      border: 1px solid black;
-      padding: 8px;
-      text-align: center;
-    }
+
     </style>
     <div class="table-container">
+      <!-- Table for Emails -->
       <table>
         <thead>
         <tr style="background-color:#B0B0B0">
-          <th>Email(s)</th>        
+          <th>Email(s)</th>
+          <th></th>       
         </tr>
         </thead>
         <?php foreach ($email as $e): ?>
           <tr>
             <td><?php echo $e['email_address']; ?></td>
+            <td align="right">
+              <form action="stats.php" method="post">
+                <input type="submit" name="actionBtn" value="X" class="btn btn-danger" />
+                <input type="hidden" name="delete_email"
+                      value="<?php echo $e['email_address']; ?>" />
+              </form>
+            </td>
           </tr>
         <?php endforeach; ?>
+        <tr>
+          <form action="stats.php" method="post">
+            <td>
+              <input type="text" class="form-control" name="newEmail" placeholder="Add Email" required />
+            </td>
+            <td align="right">
+              <input type="submit" name="actionBtn" value="✓" class="btn btn-success" />
+            </td>
+          </form>
+        </tr>
       </table>
-
+      <!-- Table for Phone Numbers -->
       <table>
         <thead>
         <tr style="background-color:#B0B0B0">
-          <th>Phone Number(s)</th>        
+          <th>Phone Number(s)</th>  
+          <th></th>       
         </tr>
         </thead>
         <?php foreach ($phone as $p): ?>
           <tr>
             <td><?php echo $p['phone_number']; ?></td>
+            <td align="right">
+              <form action="stats.php" method="post">
+                <input type="submit" name="phoneBtn" value="X" class="btn btn-danger" />
+                <input type="hidden" name="delete_phone"
+                      value="<?php echo $p['phone_number']; ?>" />
+              </form>
+            </td>
           </tr>
         <?php endforeach; ?>
+        <tr>
+          <form action="stats.php" method="post">
+            <td>
+              <input type="text" class="form-control" name="newPhone" placeholder="Add Phone Number" required />
+            </td>
+            <td align="right">
+              <input type="submit" name="phoneBtn" value="✓" class="btn btn-success" />
+            </td>
+          </form>
+        </tr>
       </table>
 
     </div>
@@ -122,10 +187,12 @@ $u_id = 1; # replace with global user id from login
   </div>
 </div>
 
+<!-- Left Section: Purchase History -->
 <div style="width:47.5%;float:left;background:#D3D3D3;border:0.5px solid #000;border-radius:10px;margin-left:2.5%;">
   <h4 style="padding-left:18px;padding-top:5px">Purchase History</h4>
 </div>
 
+<!-- Right Section: Market Stats -->
 <div style="width:47.5%;float:right;background:#D3D3D3;border:0.5px solid #000;border-radius:10px;margin-right:2.5%;">
   <h4 style="padding-left:18px;padding-top:5px">Market Stats</h4>
 </div>
