@@ -17,6 +17,15 @@
   
   <!-- Bootstrap JS -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="your name">
+  <meta name="description" content="include some description about your page">  
+    
+  <title>Bootstrap example</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="icon" type="image/png" href="http://www.cs.virginia.edu/~up3f/cs4750/images/db-icon.png" />
 
 </head>
 <body>
@@ -50,8 +59,76 @@
 
 <!-- Connect to database -->
 <?php require "connect.php" ?>
+
 <!-- Content goes here -->
 
+<?php
+require("resells-db.php");
+$user_id = 1;
+$auction_id = getCountAuctions() + 1;
+$auction_info_to_update = null;
+$auctions = selectAllAuctions();
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST')
+{
+  if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "Add Auction"))
+  {
+    addAuction($auction_id, $_POST['price'], $_POST['stock']);
+    $game_id = selectGameID($_POST['game']);
+    addSells($user_id, $auction_id);
+    addSoldon($auction_id, $game_id);
+    $auctions = selectAllAuctions();
+  }
+}
+?>
+
+<div class="container">
+  <h1>Create Your Stock</h1>  
+
+  <form name="mainForm" action="resells.php" method="post">   
+  <div class="row mb-3 mx-3">
+      Price:
+      <input type="text" class="form-control" name="price" required 
+          value="<?php if ($auction_info_to_update!=null) echo $auction_info_to_update['price'];?>"
+      />        
+    </div>  
+    <div class="row mb-3 mx-3">
+      Stock:
+      <input type="text" class="form-control" name="stock" required 
+          value="<?php if ($auction_info_to_update!=null) echo $auction_info_to_update['stock'];?>"
+      />        
+    </div>  
+	<div class="row mb-3 mx-3">
+      Game:
+      <input type="text" class="form-control" name="game" required 
+          value="<?php if ($auction_info_to_update!=null) echo $auction_info_to_update['game'];?>"
+      />        
+    </div>  
+	<div class="row mb-3 mx-3">
+      <input type="submit" class="btn btn-primary" name="actionBtn" value="Add Auction" title="click to insert auction" />        
+    </div> 
+  </form>     
+
+  <div class="row justify-content-center">  
+    <table class="w3-table w3-bordered w3-card-4 center" style="width:70%">
+      <thead>
+      <tr style="background-color:#B0B0B0">
+        <th>Auction ID</th>   
+        <th>Price</th>    
+        <th>Stock</th>
+      </tr>
+      </thead>
+    <?php foreach ($auctions as $item): ?>
+      <tr>
+        <td><?php echo $item['auction_id']; ?></td>
+        <td><?php echo $item['price']; ?></td>        
+        <td><?php echo $item['stock']; ?></td>     
+      </tr>
+    <?php endforeach; ?>
+    </table>
+  </div>
+
+</div>
 
 </body>
 </html>
