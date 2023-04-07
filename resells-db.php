@@ -56,6 +56,48 @@ function addSoldon($auction_id, $game_id)
     $statement->closeCursor();
 }
 
+function deleteSells($auction_to_delete)
+{
+    global $db;
+    $query = "delete from Sells where auction_id=:auction_to_delete";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':auction_to_delete', $auction_to_delete);
+    $statement->execute();
+    $statement->closeCursor();
+}
+
+function deleteSoldon($auction_to_delete)
+{
+    global $db;
+    $query = "delete from Sold_on where auction_id=:auction_to_delete";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':auction_to_delete', $auction_to_delete);
+    $statement->execute();
+    $statement->closeCursor();
+}
+
+function deleteAuction($auction_to_delete)
+{
+    global $db;
+    $query = "delete from Auctions where auction_id=:auction_to_delete";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':auction_to_delete', $auction_to_delete);
+    $statement->execute();
+    $statement->closeCursor();
+}
+
+function selectAllYourSoldon($user_id)
+{
+     global $db;
+     $query = "select * from Sold_on NATURAL JOIN Sells WHERE user_id=:user_id ORDER BY auction_id";
+     $statement = $db->prepare($query);
+     $statement->bindValue(':user_id', $user_id);
+     $statement->execute();
+     $results = $statement->fetchAll();
+     $statement->closeCursor();
+     return $results;
+}
+
 function selectAllAuctions()
 {
      global $db;
