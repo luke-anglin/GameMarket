@@ -46,9 +46,6 @@
 <?php require "connect.php" ?>
 <!-- Content goes here -->
 
-<script>
-  connect();
-</script>
 <h2>Featured Games</h2>
 <!-- Select just a few of the games in the Game table here and display their price and title -->
 <?php 
@@ -68,22 +65,26 @@ foreach ($results as $row) {
 <br>
 <br>
 <br>
-<h2>Search All Games</h2>
+<h2>Search All Games (that are being Auctioned)</h2>
 <h4>Click on a column header to sort by it</h4>
 <!-- Show top 25 games here by default -->
+
+
 <?php 
 // Check if the filter form has been submitted
 if (isset($_POST['filter'])) {
     $filterValue = $_POST['filterValue'];
 
     // Prepare the SQL statement to retrieve filtered data from the Game table
-    $stmt = $db->prepare("SELECT unit_price, title, avg_rating FROM Game WHERE unit_price < :filterValue");
+    $stmt = $db->prepare("SELECT game_id, unit_price, title, avg_rating FROM Game WHERE unit_price < :filterValue AND game_id IN (SELECT game_id FROM Sold_on);");
 
     // Bind the filter value parameter to the SQL statement
     $stmt->bindValue(':filterValue', $filterValue, PDO::PARAM_INT);
 } else {
     // Prepare the SQL statement to retrieve data from the Game table
-    $stmt = $db->prepare("SELECT unit_price, title, avg_rating FROM Game");
+    $stmt = $db->prepare("SELECT game_id, unit_price, title, avg_rating 
+    FROM Game
+    WHERE game_id IN (SELECT game_id FROM Sold_on);");
 }
 
 // Execute the statement and fetch the results
@@ -111,7 +112,11 @@ foreach ($results as $row) {
   echo '<td>' . $row['unit_price'] . '</td>';
   echo '<td>' . $row['title'] . '</td>';
   echo '<td>' . $row['avg_rating'] . '</td>';
-  echo '<td><button type="button" class="btn btn-success" onclick="addToCart()">Add to Cart</button>
+  echo '<td><form action="home.php" method="POST">
+  <input type="submit" name="actionBtn" value="AddToCart" class ="btn btn-danger" />
+  <input type="hidden" name="game_id" value="' . $row['game_id'] . '" />
+  <input type="hidden" name="title" value="' . $row['title'] . '" />
+  </form>
   </td>';
   echo '</tr>';
 }
@@ -119,9 +124,38 @@ foreach ($results as $row) {
 
 echo '</tbody></table>';
 
-function addToCart() {
-  
+if ($_SERVER['REQUEST_METHOD'] == 'POST')
+{
+  if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "AddToCart"))
+  {
+    $game_id = $_POST['game_id'];
+    $title = $_POST['title'];
+    // echo "<p>Running function add to cart  with $game_id and $title</p>";
+    // TODO - make user_id dynamic 
+    $user_id = 1; 
+    // Part 1 - get the auction id where this game_id is sold 
+    $stmt = $db->prepare("SELECT auction_id FROM Sold_on WHERE game_id = :game_id;");
+
+    $stmt->bindValue(':game_id', $game_id, PDO::PARAM_INT);
+
+    $stmt->execute();
+
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // echo "<p>Results: " . $results . "</p>";
+    foreach ($results as $row) {
+      // echo "<p> gonna run this with auction id " . $row['auction_id'] . "</p>";
+      $stmt = $db -> prepare ("INSERT INTO In_shopping_cart (user_id, auction_id) VALUES (:user_id, :auction_id)");
+      $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+      $stmt->bindValue(':auction_id', $row['auction_id'], PDO::PARAM_INT);
+      $stmt->execute();
+    } 
+  }
+  $message = "You added a game with game id $game_id to your shopping cart.";
+  echo "<script>alert('$message');</script>";
 }
+
+
+
 
 // Include DataTables jQuery plugin and initialize the table
 echo '<script src="//cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>';
