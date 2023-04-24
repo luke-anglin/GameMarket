@@ -1,3 +1,5 @@
+<?php session_start(); ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -61,6 +63,7 @@
 
 <!-- Content goes here -->
 <?php
+session_start();
 $u_id = $_SESSION['user_id']; # replace with global user id from login
 echo "user id is $u_id";
 ?>

@@ -1,3 +1,5 @@
+<?php session_start(); ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -109,7 +111,7 @@
 	</div>
 <?php
 require('connect.php');
-session_start();
+# session_start();
 if(isset($_POST['new_username']) && isset($_POST['new_password']) && isset($_POST['last_name']) && isset($_POST['first_name'])){
     $new_username = $_POST['new_username'];
     $new_password = $_POST['new_password'];
