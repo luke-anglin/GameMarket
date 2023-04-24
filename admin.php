@@ -22,6 +22,7 @@
 <body>
 
 <!-- Navbar -->
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" href="#">Game Market</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,12 +45,17 @@
       <li class="nav-item">
         <a class="nav-link" href="stats.php">My Stats</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="auth.php">Login/Logout</a>
+      </li>
     </ul>
   </div>
 </nav>
 
 <!-- Connect to database -->
 <?php require "connect.php" ?>
+<?php session_start() ?>
+
 <!-- Content goes here -->
 </body>
 </html>

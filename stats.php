@@ -44,19 +44,25 @@
       <li class="nav-item">
         <a class="nav-link" href="stats.php">My Stats</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="auth.php">Login/Logout</a>
+      </li>
     </ul>
   </div>
 </nav>
 
 <!-- Connect to database -->
 <?php require "connect.php" ?>
+<?php session_start() ?>
+
 
 <!-- SQL Queries -->
 <?php require("stats-db.php"); ?>
 
 <!-- Content goes here -->
 <?php
-$u_id = 1; # replace with global user id from login
+$u_id = $_SESSION['user_id']; # replace with global user id from login
+echo "user id is $u_id";
 ?>
 
 <!-- Button Actions -->

@@ -14,7 +14,6 @@
 
 </head>
 <body>
-
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" href="#">Game Market</a>
@@ -38,12 +37,15 @@
       <li class="nav-item">
         <a class="nav-link" href="stats.php">My Stats</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="auth.php">Login/Logout</a>
+      </li>
     </ul>
   </div>
 </nav>
-
 <!-- Connect to database -->
 <?php require "connect.php" ?>
+<?php session_start() ?>
 <!-- Content goes here -->
 
 <h2>Featured Games</h2>
@@ -132,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     $title = $_POST['title'];
     // echo "<p>Running function add to cart  with $game_id and $title</p>";
     // TODO - make user_id dynamic 
-    $user_id = 1; 
+    $user_id = $_SESSION['user_id']; 
     // Part 1 - get the auction id where this game_id is sold 
     $stmt = $db->prepare("SELECT auction_id FROM Sold_on WHERE game_id = :game_id;");
 

@@ -44,12 +44,17 @@
       <li class="nav-item">
         <a class="nav-link" href="stats.php">My Stats</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="auth.php">Login/Logout</a>
+      </li>
     </ul>
   </div>
 </nav>
 
 <!-- Connect to database -->
 <?php require "connect.php" ?>
+<?php session_start() ?>
+
 <!-- Content goes here -->
 
 <h2>Search All Games In Shopping Cart</h2>
