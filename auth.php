@@ -68,6 +68,11 @@
 					<li class="nav-item">
 						<a class="nav-link" data-toggle="tab" href="#signup">Signup</a>
 					</li>
+          <?php if(isset($_SESSION['user_id'])) { ?>
+                    <li class="nav-item ml-auto">
+                        <a class="nav-link" href="logout.php">Logout</a>
+                    </li>
+          <?php } ?>
 				</ul>
 				<div class="tab-content">
 					<div id="login" class="tab-pane fade show active">
@@ -82,6 +87,7 @@
 							</div>
 							<button type="submit" class="btn btn-primary">Login</button>
 						</form>
+         
 					</div>
 					<div id="signup" class="tab-pane fade">
 						<form action="auth.php" method="POST">
