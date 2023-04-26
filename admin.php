@@ -56,9 +56,6 @@
 <?php require "connect.php" ?>
 <?php session_start() ?>
 <h2>Search All Games (that are being Auctioned)</h2>
-<h4>Click on a column header to sort by it</h4>
-<!-- Show top 25 games here by default -->
-
 
 <?php 
 // Check if the filter form has been submitted
@@ -92,6 +89,7 @@ echo '<table id="gameTable" class="table table-striped">';
 echo '<thead><tr>';
 echo '<th><a href="#" class="sort" data-sort="unit_price">Unit Price</a></th>';
 echo '<th><a href="#" class="sort" data-sort="title">Title</a></th>';
+echo '<th>Action</th>';
 echo '</tr></thead>';
 echo '<tbody>';
 
@@ -99,16 +97,50 @@ foreach ($results as $row) {
   echo '<tr>';
   echo '<td>' . $row['unit_price'] . '</td>';
   echo '<td>' . $row['title'] . '</td>';
+  echo '<td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#gameModal' . $row['game_id'] . '">Update</button></td>';
   echo '<td><form action="home.php" method="POST">
   <input type="hidden" name="game_id" value="' . $row['game_id'] . '" />
   <input type="hidden" name="title" value="' . $row['title'] . '" />
+  <input type="hidden" name="title" value="' . $row['unit_price'] . '" />
   </form>
   </td>';
   echo '</tr>';
+  echo '<div class="modal fade" id="gameModal' . $row['game_id'] . '" tabindex="-1" role="dialog" aria-labelledby="gameModalLabel' . $row['game_id'] . '" aria-hidden="true">';
+  echo '<div class="modal-dialog" role="document">';
+  echo '<div class="modal-content">';
+  echo '<div class="modal-header">';
+  echo '<h5 class="modal-title" id="gameModalLabel' . $row['game_id'] . '">Update Game</h5>';
+  echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+  echo '<span aria-hidden="true">&times;</span>';
+  echo '</button>';
+  echo '</div>';
+  echo '<div class="modal-body">';
+  echo '<form action="update_game.php" method="POST">';
+  echo '<input type="hidden" name="game_id" value="' . $row['game_id'] . '">';
+  echo '<div class="form-group">';
+  echo '<label for="title">Title</label>';
+  echo '<input type="text" class="form-control" name="title" value="' . $row['title'] . '">';
+  echo '</div>';
+  echo '<div class="form-group">';
+  echo '<label for="unit_price">Unit Price</label>';
+  echo '<input type="number" class="form-control" name="unit_price" value="' . $row['unit_price'] . '">';
+  echo '</div>';
+  echo '<div class="form-group">';
+  echo '<label for="delete">Delete</label>';
+  echo '<input type="checkbox" name="delete">';
+  echo '</div>';
+  echo '<button type="submit" class="btn btn-primary">Save Changes</button>';
+  echo '</form>';
+  echo '</div>';
+  echo '<div class="modal-footer">';
+  echo '<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>';
+  echo '</div>';
+  echo '</div>';
 }
 
 
 echo '</tbody></table>';
+
 
 
 
