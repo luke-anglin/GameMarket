@@ -55,6 +55,79 @@
 <!-- Connect to database -->
 <?php require "connect.php" ?>
 <?php session_start() ?>
+<h2>Search All Games (that are being Auctioned)</h2>
+<h4>Click on a column header to sort by it</h4>
+<!-- Show top 25 games here by default -->
+
+
+<?php 
+// Check if the filter form has been submitted
+if (isset($_POST['filter'])) {
+    $filterValue = $_POST['filterValue'];
+
+    // Prepare the SQL statement to retrieve filtered data from the Game table
+    $stmt = $db->prepare("SELECT game_id, unit_price, title FROM Game WHERE unit_price < :filterValue AND game_id IN (SELECT game_id FROM Sold_on);");
+
+    // Bind the filter value parameter to the SQL statement
+    $stmt->bindValue(':filterValue', $filterValue, PDO::PARAM_INT);
+} else {
+    // Prepare the SQL statement to retrieve data from the Game table
+    $stmt = $db->prepare("SELECT game_id, unit_price, title
+    FROM Game
+    WHERE game_id IN (SELECT game_id FROM Sold_on);");
+}
+
+// Execute the statement and fetch the results
+$stmt->execute();
+$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Create the HTML table using Bootstrap classes
+echo '<form method="POST">';
+echo '<label for="filterValue">Filter by price (below x dollars):</label>';
+echo '<input type="number" name="filterValue" id="filterValue" value="'.(isset($_POST['filter']) ? $filterValue : '').'">';
+echo '<button type="submit" name="filter">Filter</button>';
+echo '</form>';
+
+echo '<table id="gameTable" class="table table-striped">';
+echo '<thead><tr>';
+echo '<th><a href="#" class="sort" data-sort="unit_price">Unit Price</a></th>';
+echo '<th><a href="#" class="sort" data-sort="title">Title</a></th>';
+echo '</tr></thead>';
+echo '<tbody>';
+
+foreach ($results as $row) {
+  echo '<tr>';
+  echo '<td>' . $row['unit_price'] . '</td>';
+  echo '<td>' . $row['title'] . '</td>';
+  echo '<td><form action="home.php" method="POST">
+  <input type="hidden" name="game_id" value="' . $row['game_id'] . '" />
+  <input type="hidden" name="title" value="' . $row['title'] . '" />
+  </form>
+  </td>';
+  echo '</tr>';
+}
+
+
+echo '</tbody></table>';
+
+
+
+// Include DataTables jQuery plugin and initialize the table
+echo '<script src="//cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>';
+echo '<script>
+$(document).ready(function() {
+    $("#gameTable").DataTable({
+        "order": []
+    });
+    
+    // Add click event handlers for the column headers to sort by the clicked column
+    $(".sort").on("click", function() {
+        var column = $(this).data("sort");
+        $("#gameTable").DataTable().order([column, "asc"]).draw();
+    });
+});
+</script>';
+?>
 
 <!-- Content goes here -->
 </body>
