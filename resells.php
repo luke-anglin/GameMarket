@@ -69,7 +69,7 @@
 
 <?php
 require("resells-db.php");
-$user_id = 1;
+$user_id = $_SESSION['user_id'];
 $auction_id = getCountAuctions() + 1;
 $auction_info_to_update = null;
 $auctions = selectAllAuctions();
