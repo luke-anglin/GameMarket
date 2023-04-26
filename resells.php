@@ -68,6 +68,12 @@
 <!-- Content goes here -->
 
 <?php
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    echo "Please log in to continue.";
+    exit;
+}
+
 require("resells-db.php");
 $user_id = $_SESSION['user_id'];
 $auction_id = getCountAuctions() + 1;
