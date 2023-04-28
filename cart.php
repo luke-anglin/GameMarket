@@ -55,6 +55,11 @@
 <?php require "connect.php" ?>
 <?php session_start() ?>
 
+<?php if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == null){
+  echo "<p>Can't have a shopping cart without being logged in</p>"; 
+  die();
+} ?>
+
 <!-- Content goes here -->
 
 <h2>Search All Games In Shopping Cart</h2>

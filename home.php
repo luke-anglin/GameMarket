@@ -133,8 +133,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     $game_id = $_POST['game_id'];
     $title = $_POST['title'];
     // echo "<p>Running function add to cart  with $game_id and $title</p>";
-    // TODO - make user_id dynamic 
-    $user_id = $_SESSION['user_id']; 
+    if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == null){
+      echo "<p>Can't add game to shopping cart when you aren't logged in!</p>"; 
+      exit(); 
+    }
+   
     // Part 1 - get the auction id where this game_id is sold 
     $stmt = $db->prepare("SELECT auction_id FROM Sold_on WHERE game_id = :game_id;");
 
