@@ -53,12 +53,14 @@
 
 <!-- Connect to database -->
 <?php require "connect.php" ?>
-<?php session_start() ?>
+
+<?php session_start(); $uid = $_SESSION['user_id']; ?>
 
 <?php if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == null){
   echo "<p>Can't have a shopping cart without being logged in</p>"; 
   die();
 } ?>
+
 
 <!-- Content goes here -->
 
@@ -71,13 +73,13 @@ if (isset($_POST['filter'])) {
     $filterValue = $_POST['filterValue'];
 
     // Prepare the SQL statement to retrieve filtered data from the Game table
-    $stmt = $db->prepare("SELECT G.unit_price, G.title, G.avg_rating FROM In_shopping_cart NATURAL JOIN Sold_on NATURAL JOIN Game G WHERE unit_price < :filterValue");
+    $stmt = $db->prepare("SELECT G.unit_price, G.title, G.avg_rating FROM In_shopping_cart NATURAL JOIN Sold_on NATURAL JOIN Game G WHERE unit_price < :filterValue AND user_id = $uid");
 
     // Bind the filter value parameter to the SQL statement
     $stmt->bindValue(':filterValue', $filterValue, PDO::PARAM_INT);
 } else {
     // Prepare the SQL statement to retrieve data from the Game table
-    $stmt = $db->prepare("SELECT G.unit_price, G.title, G.avg_rating FROM In_shopping_cart NATURAL JOIN Sold_on NATURAL JOIN Game G");
+    $stmt = $db->prepare("SELECT G.unit_price, G.title, G.avg_rating FROM In_shopping_cart NATURAL JOIN Sold_on NATURAL JOIN Game G WHERE user_id = $uid");
 }
 
 // Execute the statement and fetch the results
@@ -109,6 +111,8 @@ foreach ($results as $row) {
 
 echo '</tbody></table>';
 
+
+
 // Include DataTables jQuery plugin and initialize the table
 echo '<script src="//cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>';
 echo '<script>
@@ -125,7 +129,9 @@ $(document).ready(function() {
 });
 </script>';
 ?>
-
+<form method="post" action="cart-db.php">
+    <button class="btn btn-primary" type="submit">Buy games</button>
+</form>
 
 
 </body>

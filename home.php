@@ -145,6 +145,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 
     $stmt->execute();
 
+    $user_id = $_SESSION['user_id']; 
+
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     // echo "<p>Results: " . $results . "</p>";
     foreach ($results as $row) {
