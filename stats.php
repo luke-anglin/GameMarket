@@ -65,7 +65,15 @@
 <?php
 session_start();
 $u_id = $_SESSION['user_id']; # replace with global user id from login
-echo "user id is $u_id";
+# echo "user id is $u_id";
+?>
+
+<!-- Check if Logged In -->
+<?php
+if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == null){
+  echo "You Do Not Have Access To This Page: Please Log In";
+  die();
+}
 ?>
 
 <!-- Button Actions -->
