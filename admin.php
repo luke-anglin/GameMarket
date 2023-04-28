@@ -55,9 +55,25 @@
 <!-- Connect to database -->
 <?php require "connect.php" ?>
 <?php session_start() ?>
-<h2>Search All Games (that are being Auctioned)</h2>
+<?php
+$uid = $_SESSION['user_id'];
+$ad = $db->prepare("SELECT admin FROM User WHERE user_id = $uid");
+$ad->execute();
+$adminValue = $ad->fetch(PDO::FETCH_ASSOC);
+if (!isset($_SESSION['user_id'])) {
+  echo "You Do Not Have Access To This Page: Please Log In";
+  exit;
+}
+if ($adminValue["admin"] != 1) {
+  echo "You Do Not Have Access To This Page: You are not admin";
+  exit;
+}
+?>
+
+<h2>Update Available Games</h2>
 
 <?php 
+
 // Check if the filter form has been submitted
 if (isset($_POST['filter'])) {
     $filterValue = $_POST['filterValue'];
