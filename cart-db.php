@@ -16,11 +16,11 @@ function buyGamesInCart() {
     global $db;
     $uid = $_SESSION['user_id'];
     echo "<p>uid is " . $uid . "</p>";
-    $stmt = $db->prepare("SELECT G.game_id, A.auction_id, A.stock
-                          FROM In_shopping_cart 
-                          NATURAL JOIN Auctions A
-                          NATURAL JOIN Sold_on 
-                          NATURAL JOIN Game G WHERE user_id = $uid;");
+    $stmt = $db->prepare("SELECT game_id, auction_id, stock
+                                FROM In_shopping_cart 
+                                NATURAL LEFT JOIN Auctions
+                                NATURAL LEFT JOIN Sold_on
+                                WHERE user_id = $uid;");
     $stmt->execute(); 
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -51,14 +51,14 @@ function buyGamesInCart() {
             // Auctions - delete the auction where auction_Id = this auction_id 
             // Sold_on - delete where auction_id = this auction_id 
             // Sells - delete where auction id = this auction id 
-            $stmt = $db -> prepare("DELETE FROM Auctions 
-            WHERE auction_id = $auction_id;");
-            $stmt -> execute(); 
             $stmt = $db -> prepare("DELETE FROM Sells
             WHERE auction_id = $auction_id;"); 
             $stmt -> execute(); 
             $stmt = $db -> prepare("DELETE FROM Sold_on
             WHERE auction_id = $auction_id;"); 
+            $stmt -> execute();
+            $stmt = $db -> prepare("DELETE FROM Auctions 
+            WHERE auction_id = $auction_id;");
             $stmt -> execute(); 
         }
 
