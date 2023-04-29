@@ -78,14 +78,15 @@ if (isset($_POST['filter'])) {
     $filterValue = $_POST['filterValue'];
 
     // Prepare the SQL statement to retrieve filtered data from the Game table
-    $stmt = $db->prepare("SELECT game_id, unit_price, title, avg_rating FROM Game WHERE unit_price < :filterValue AND game_id IN (SELECT game_id FROM Sold_on);");
+    $stmt = $db->prepare("SELECT auction_id, game_id, price, title, avg_rating, username, stock
+    FROM Game NATURAL RIGHT JOIN Sold_on NATURAL LEFT JOIN Auctions NATURAL LEFT JOIN Sells NATURAL LEFT JOIN User WHERE unit_price < :filterValue AND game_id IN (SELECT game_id FROM Sold_on);");
 
     // Bind the filter value parameter to the SQL statement
     $stmt->bindValue(':filterValue', $filterValue, PDO::PARAM_INT);
 } else {
     // Prepare the SQL statement to retrieve data from the Game table
-    $stmt = $db->prepare("SELECT game_id, unit_price, title, avg_rating 
-    FROM Game
+    $stmt = $db->prepare("SELECT auction_id, game_id, price, title, avg_rating, username, stock
+    FROM Game NATURAL RIGHT JOIN Sold_on NATURAL LEFT JOIN Auctions NATURAL LEFT JOIN Sells NATURAL LEFT JOIN User
     WHERE game_id IN (SELECT game_id FROM Sold_on);");
 }
 
@@ -102,18 +103,22 @@ echo '</form>';
 
 echo '<table id="gameTable" class="table table-striped">';
 echo '<thead><tr>';
-echo '<th><a href="#" class="sort" data-sort="unit_price">Unit Price</a></th>';
+echo '<th><a href="#" class="sort" data-sort="unit_price">Price (USD)</a></th>';
+echo '<th><a href="#" class="sort" data-sort="stock">Stock</a></th>';
 echo '<th><a href="#" class="sort" data-sort="title">Title</a></th>';
 echo '<th><a href="#" class="sort" data-sort="avg_rating">Average Rating</a></th>';
+echo '<th><a href="#" class="sort" data-sort="username">Seller</a></th>';
 echo '<th><a href="#">Cart</a></th>';
 echo '</tr></thead>';
 echo '<tbody>';
 
 foreach ($results as $row) {
   echo '<tr>';
-  echo '<td>' . $row['unit_price'] . '</td>';
+  echo '<td>' . $row['price'] . '</td>';
+  echo '<td>' . $row['stock'] . '</td>';
   echo '<td>' . $row['title'] . '</td>';
   echo '<td>' . $row['avg_rating'] . '</td>';
+  echo '<td>' . $row['username'] . '</td>';
   echo '<td><form action="home.php" method="POST">
   <input type="submit" name="actionBtn" value="AddToCart" class ="btn btn-danger" />
   <input type="hidden" name="game_id" value="' . $row['game_id'] . '" />
@@ -130,14 +135,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 {
   if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "AddToCart"))
   {
-    $game_id = $_POST['game_id'];
-    $title = $_POST['title'];
+    // $game_id = $_POST['game_id'];
+    // $title = $_POST['title'];
     // echo "<p>Running function add to cart  with $game_id and $title</p>";
     if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == null){
       echo "<p>Can't add game to shopping cart when you aren't logged in!</p>"; 
       exit(); 
     }
-   
+   /*
     // Part 1 - get the auction id where this game_id is sold 
     $stmt = $db->prepare("SELECT auction_id FROM Sold_on WHERE game_id = :game_id;");
 
@@ -145,9 +150,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 
     $stmt->execute();
 
-    $user_id = $_SESSION['user_id']; 
-
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    */
+
+    $user_id = $_SESSION['user_id']; 
+    $auction_id = $_POST['auction_id'];
+    $title = $_POST['title'];
+
+    // Check if Auction is already in your shopping cart
+    if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == null){
+      echo "<p>This game is already in your shopping cart.</p>"; 
+      exit(); 
+    }
+
     // echo "<p>Results: " . $results . "</p>";
     foreach ($results as $row) {
       // echo "<p> gonna run this with auction id " . $row['auction_id'] . "</p>";
@@ -157,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
       $stmt->execute();
     } 
   }
-  $message = "You added a game with game id $game_id to your shopping cart.";
+  $message = "You added $title to your shopping cart.";
   echo "<script>alert('$message');</script>";
 }
 
