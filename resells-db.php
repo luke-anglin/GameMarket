@@ -1,7 +1,17 @@
 <?php
-function addAuction($auction_id, $price, $stock)
+function addAuction($auction_id, $price, $stock, $game_title)
 {
     global $db;
+    
+    // Check if the game title is valid
+    $game_id = selectGameID($game_title);
+    if (!$game_id) {
+        // Display error message and return
+        echo "Error: Invalid game title.";
+        return;
+    }
+    
+    // Insert auction data into Auctions table
     $query = "insert into Auctions values (:auction_id, :price, :stock)";
     $statement = $db->prepare($query);
     $statement->bindValue(':auction_id', $auction_id);
@@ -9,7 +19,14 @@ function addAuction($auction_id, $price, $stock)
     $statement->bindValue(':stock', $stock);
     $statement->execute();
     $statement->closeCursor();
+    
+    // Insert data into Sells table
+    addSells($_SESSION['user_id'], $auction_id);
+    
+    // Insert data into Sold_on table
+    addSoldon($auction_id, $game_id);
 }
+
 
 function selectGameID($game)
 {

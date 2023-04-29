@@ -39,7 +39,7 @@
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" href="home.php">Home</a>
+        <a class="nav-link" href="home.php">Auctions</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="cart.php">Shopping Cart</a>
@@ -70,7 +70,7 @@
 <?php
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    echo "Please log in to continue.";
+    echo "You Do Not Have Access To This Page: Please Log In";
     exit;
 }
 
@@ -85,10 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 {
   if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "Add Auction"))
   {
-    addAuction($auction_id, $_POST['price'], $_POST['stock']);
-    $game_id = selectGameID($_POST['game']);
-    addSells($user_id, $auction_id);
-    addSoldon($auction_id, $game_id);
+    addAuction($auction_id, $_POST['price'], $_POST['stock'], $_POST['game']);
     $soldon = selectAllYourSoldon($user_id);
   }
   else if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "Delete"))

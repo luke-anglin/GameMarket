@@ -30,7 +30,7 @@
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" href="home.php">Home</a>
+        <a class="nav-link" href="home.php">Auctions</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="cart.php">Shopping Cart</a>
@@ -73,13 +73,17 @@ if (isset($_POST['filter'])) {
     $filterValue = $_POST['filterValue'];
 
     // Prepare the SQL statement to retrieve filtered data from the Game table
-    $stmt = $db->prepare("SELECT G.unit_price, G.title, G.avg_rating FROM In_shopping_cart NATURAL JOIN Sold_on NATURAL JOIN Game G WHERE unit_price < :filterValue AND user_id = $uid");
+    $stmt = $db->prepare("SELECT auction_id, game_id, price, title, avg_rating, stock, (SELECT username FROM Sells NATURAL JOIN User WHERE auction_id = (SELECT auction_id FROM In_shopping_cart WHERE user_id = $uid)) as username
+    FROM In_shopping_cart NATURAL LEFT JOIN Sold_on NATURAL LEFT JOIN Game NATURAL LEFT JOIN Auctions
+    WHERE user_id = $uid;");
 
     // Bind the filter value parameter to the SQL statement
     $stmt->bindValue(':filterValue', $filterValue, PDO::PARAM_INT);
 } else {
     // Prepare the SQL statement to retrieve data from the Game table
-    $stmt = $db->prepare("SELECT G.unit_price, G.title, G.avg_rating FROM In_shopping_cart NATURAL JOIN Sold_on NATURAL JOIN Game G WHERE user_id = $uid");
+    $stmt = $db->prepare("SELECT auction_id, game_id, price, title, avg_rating, stock, (SELECT username FROM Sells NATURAL JOIN User WHERE auction_id = (SELECT auction_id FROM In_shopping_cart WHERE user_id = $uid)) as username
+    FROM In_shopping_cart NATURAL LEFT JOIN Sold_on NATURAL LEFT JOIN Game NATURAL LEFT JOIN Auctions
+    WHERE user_id = $uid;");
 }
 
 // Execute the statement and fetch the results
@@ -95,17 +99,23 @@ echo '</form>';
 
 echo '<table id="gameTable" class="table table-striped">';
 echo '<thead><tr>';
-echo '<th><a href="#" class="sort" data-sort="unit_price">Unit Price</a></th>';
+echo '<th><a href="#" class="sort" data-sort="auction_id">Auction #</a></th>';
+echo '<th><a href="#" class="sort" data-sort="price">Price (USD)</a></th>';
+echo '<th><a href="#" class="sort" data-sort="stock">Stock</a></th>';
 echo '<th><a href="#" class="sort" data-sort="title">Title</a></th>';
 echo '<th><a href="#" class="sort" data-sort="avg_rating">Average Rating</a></th>';
+echo '<th><a href="#" class="sort" data-sort="username">Seller</a></th>';
 echo '</tr></thead>';
 echo '<tbody>';
 
 foreach ($results as $row) {
     echo '<tr>';
-    echo '<td>' . $row['unit_price'] . '</td>';
+    echo '<td>' . $row['auction_id'] . '</td>';
+    echo '<td>' . $row['price'] . '</td>';
+    echo '<td>' . $row['stock'] . '</td>';
     echo '<td>' . $row['title'] . '</td>';
     echo '<td>' . $row['avg_rating'] . '</td>';
+    echo '<td>' . $row['username'] . '</td>';
     echo '</tr>';
 }
 
