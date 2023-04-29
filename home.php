@@ -23,7 +23,7 @@
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" href="home.php">Home</a>
+        <a class="nav-link" href="home.php">Auctions</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="cart.php">Shopping Cart</a>
@@ -103,6 +103,7 @@ echo '</form>';
 
 echo '<table id="gameTable" class="table table-striped">';
 echo '<thead><tr>';
+echo '<th><a href="#" class="sort" data-sort="auction_id">Auction #</a></th>';
 echo '<th><a href="#" class="sort" data-sort="unit_price">Price (USD)</a></th>';
 echo '<th><a href="#" class="sort" data-sort="stock">Stock</a></th>';
 echo '<th><a href="#" class="sort" data-sort="title">Title</a></th>';
@@ -114,6 +115,7 @@ echo '<tbody>';
 
 foreach ($results as $row) {
   echo '<tr>';
+  echo '<td>' . $row['auction_id'] . '</td>';
   echo '<td>' . $row['price'] . '</td>';
   echo '<td>' . $row['stock'] . '</td>';
   echo '<td>' . $row['title'] . '</td>';
@@ -121,8 +123,10 @@ foreach ($results as $row) {
   echo '<td>' . $row['username'] . '</td>';
   echo '<td><form action="home.php" method="POST">
   <input type="submit" name="actionBtn" value="AddToCart" class ="btn btn-danger" />
+  <input type="hidden" name="auction_id" value="' . $row['auction_id'] . '" />
   <input type="hidden" name="game_id" value="' . $row['game_id'] . '" />
   <input type="hidden" name="title" value="' . $row['title'] . '" />
+  <input type="hidden" name="username" value="' . $row['username'] . '" />
   </form>
   </td>';
   echo '</tr>';
@@ -138,10 +142,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     // $game_id = $_POST['game_id'];
     // $title = $_POST['title'];
     // echo "<p>Running function add to cart  with $game_id and $title</p>";
+
     if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == null){
       echo "<p>Can't add game to shopping cart when you aren't logged in!</p>"; 
       exit(); 
     }
+
    /*
     // Part 1 - get the auction id where this game_id is sold 
     $stmt = $db->prepare("SELECT auction_id FROM Sold_on WHERE game_id = :game_id;");
@@ -156,11 +162,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     $user_id = $_SESSION['user_id']; 
     $auction_id = $_POST['auction_id'];
     $title = $_POST['title'];
+    $seller_name = $_POST['username'];
+
+    // Check if you are the seller
+    $stmt = $db->prepare("SELECT user_id as sell FROM User WHERE username = :username;");
+    $stmt->bindValue(':username', $seller_name, PDO::PARAM_INT);
+    $stmt->execute();
+    $seller_id = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+    foreach ($seller_id as $s) {
+      if ($s['sell'] == $user_id){
+        echo "<script>alert('You are the seller of the game, cannot be added.');</script>"; 
+        exit(); 
+      }
+    }
 
     // Check if Auction is already in your shopping cart
-    if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] == null){
-      echo "<p>This game is already in your shopping cart.</p>"; 
-      exit(); 
+    $stmt = $db->prepare("SELECT EXISTS 
+    (SELECT 1 FROM In_shopping_cart WHERE user_id = :user_id AND auction_id = :auction_id) as e;");
+    $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->bindValue(':auction_id', $auction_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $exists = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($exists as $e) {
+      if ($e['e'] == 1){
+        echo "<script>alert('This game is already in your shopping cart. Not re-added');</script>"; 
+        exit(); 
+      }
     }
 
     // echo "<p>Results: " . $results . "</p>";
