@@ -79,7 +79,7 @@ if (isset($_POST['filter'])) {
     $filterValue = $_POST['filterValue'];
 
     // Prepare the SQL statement to retrieve filtered data from the Game table
-    $stmt = $db->prepare("SELECT game_id, unit_price, title FROM Game WHERE unit_price < :filterValue AND game_id IN (SELECT game_id FROM Sold_on);");
+    $stmt = $db->prepare("SELECT game_id, unit_price, title FROM Game WHERE unit_price < :filterValue AND game_id;");
 
     // Bind the filter value parameter to the SQL statement
     $stmt->bindValue(':filterValue', $filterValue, PDO::PARAM_INT);
@@ -87,7 +87,7 @@ if (isset($_POST['filter'])) {
     // Prepare the SQL statement to retrieve data from the Game table
     $stmt = $db->prepare("SELECT game_id, unit_price, title
     FROM Game
-    WHERE game_id IN (SELECT game_id FROM Sold_on);");
+    WHERE game_id;");
 }
 
 // Execute the statement and fetch the results
