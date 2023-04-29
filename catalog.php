@@ -1,19 +1,28 @@
+<?php session_start(); ?>
+
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <title>Game Market</title>
+  <!-- Material UI stylesheets -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.2/iconfont/material-icons.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.5.0/mdb.min.css" integrity="sha512-W+GfoOFQR1rwnr5/dkrJLD8Wz7VmyvOaJH7G9Xzs8pKq+oLHJmt00b/IC0J8pETq3BvIbT6Tl9USUfxxR2Qx6w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   
   <!-- jQuery -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js" integrity="sha512-pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  
   <!-- Bootstrap JS -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </head>
 <body>
+
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" href="#">Game Market</a>
@@ -46,11 +55,40 @@
     </ul>
   </div>
 </nav>
+
 <!-- Connect to database -->
 <?php require "connect.php" ?>
-<?php session_start() ?>
+
+
+<!-- SQL Queries -->
+<?php require("stats-db.php"); ?>
+
 <!-- Content goes here -->
-<h2>Search All Games (that are being Auctioned)</h2>
+<?php
+session_start();
+$u_id = $_SESSION['user_id']; # replace with global user id from login
+# echo "user id is $u_id";
+?>
+
+
+<h2>Featured Games</h2>
+<!-- Select just a few of the games in the Game table here and display their price and title -->
+<?php 
+$stmt = $db->prepare('SELECT unit_price, title, avg_rating FROM Game LIMIT :offset, :limit');
+$stmt->bindValue(':offset', 0, PDO::PARAM_INT); // Offset of 0
+$stmt->bindValue(':limit', 5, PDO::PARAM_INT); // Limit of 10 rows
+$stmt->execute();
+
+// Fetch the results as an array
+$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Loop through the results and do something with each row
+foreach ($results as $row) {
+    echo $row['title'] . ' ' . $row['unit_price'] . ' ' . $row['avg_rating'] . ' ' . '<br>';
+}
+?>
+<br>
+<h2>Search All Games in our Catalog</h2>
 <h4>Click on a column header to sort by it</h4>
 <!-- Show top 25 games here by default -->
 
@@ -61,18 +99,14 @@ if (isset($_POST['filter'])) {
     $filterValue = $_POST['filterValue'];
 
     // Prepare the SQL statement to retrieve filtered data from the Game table
-    $stmt = $db->prepare("SELECT auction_id, game_id, price, title, avg_rating, username, stock
-    FROM Game NATURAL RIGHT JOIN Sold_on NATURAL LEFT JOIN Auctions NATURAL LEFT JOIN Sells NATURAL LEFT JOIN User WHERE unit_price < :filterValue AND game_id IN (SELECT game_id FROM Sold_on);");
+    $stmt = $db->prepare("SELECT * FROM Game WHERE unit_price < :filterValue");
 
     // Bind the filter value parameter to the SQL statement
     $stmt->bindValue(':filterValue', $filterValue, PDO::PARAM_INT);
 } else {
     // Prepare the SQL statement to retrieve data from the Game table
-    $stmt = $db->prepare("SELECT auction_id, game_id, price, title, avg_rating, username, stock
-    FROM Game NATURAL RIGHT JOIN Sold_on NATURAL LEFT JOIN Auctions NATURAL LEFT JOIN Sells NATURAL LEFT JOIN User
-    WHERE game_id IN (SELECT game_id FROM Sold_on);");
+    $stmt = $db->prepare("SELECT * FROM Game");
 }
-
 // Execute the statement and fetch the results
 $stmt->execute();
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -86,32 +120,24 @@ echo '</form>';
 
 echo '<table id="gameTable" class="table table-striped">';
 echo '<thead><tr>';
-echo '<th><a href="#" class="sort" data-sort="auction_id">Auction #</a></th>';
-echo '<th><a href="#" class="sort" data-sort="unit_price">Price (USD)</a></th>';
-echo '<th><a href="#" class="sort" data-sort="stock">Stock</a></th>';
+echo '<th><a href="#" class="sort" data-sort="Game ID">Game ID</a></th>';
+echo '<th><a href="#" class="sort" data-sort="Genre">Genre</a></th>';
+echo '<th><a href="#" class="sort" data-sort="Average rating">Average rating</a></th>';
 echo '<th><a href="#" class="sort" data-sort="title">Title</a></th>';
-echo '<th><a href="#" class="sort" data-sort="avg_rating">Average Rating</a></th>';
-echo '<th><a href="#" class="sort" data-sort="username">Seller</a></th>';
-echo '<th><a href="#">Cart</a></th>';
+echo '<th><a href="#" class="sort" data-sort="avg_rating">Release Date</a></th>';
+echo '<th><a href="#" class="sort" data-sort="username">Unit Price</a></th>';
 echo '</tr></thead>';
 echo '<tbody>';
 
 foreach ($results as $row) {
   echo '<tr>';
-  echo '<td>' . $row['auction_id'] . '</td>';
-  echo '<td>' . $row['price'] . '</td>';
-  echo '<td>' . $row['stock'] . '</td>';
-  echo '<td>' . $row['title'] . '</td>';
+  echo '<td>' . $row['game_id'] . '</td>';
+  echo '<td>' . $row['genre'] . '</td>';
   echo '<td>' . $row['avg_rating'] . '</td>';
-  echo '<td>' . $row['username'] . '</td>';
-  echo '<td><form action="home.php" method="POST">
-  <input type="submit" name="actionBtn" value="AddToCart" class ="btn btn-danger" />
-  <input type="hidden" name="auction_id" value="' . $row['auction_id'] . '" />
-  <input type="hidden" name="game_id" value="' . $row['game_id'] . '" />
-  <input type="hidden" name="title" value="' . $row['title'] . '" />
-  <input type="hidden" name="username" value="' . $row['username'] . '" />
-  </form>
-  </td>';
+  echo '<td>' . $row['title'] . '</td>';
+  echo '<td>' . $row['release_date'] . '</td>';
+  echo '<td>' . $row['unit_price'] . '</td>';
+
   echo '</tr>';
 }
 
