@@ -159,16 +159,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     */
 
-    $user_id = $_SESSION['user_id']; 
+    $user_id = $_SESSION['user_id'];
     $auction_id = $_POST['auction_id'];
     $title = $_POST['title'];
     $seller_name = $_POST['username'];
 
     // Check if you are the seller
     $stmt = $db->prepare("SELECT user_id as sell FROM User WHERE username = :username;");
-    $stmt->bindValue(':username', $seller_name, PDO::PARAM_INT);
+    $stmt->bindValue(':username', $seller_name);
     $stmt->execute();
-    $seller_id = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+    $seller_id = $stmt->fetchAll();
     foreach ($seller_id as $s) {
       if ($s['sell'] == $user_id){
         echo "<script>alert('You are the seller of the game, cannot be added.');</script>"; 
