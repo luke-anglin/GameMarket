@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 28, 2023 at 11:42 AM
+-- Generation Time: Apr 30, 2023 at 06:59 PM
 -- Server version: 10.6.12-MariaDB-0ubuntu0.22.04.1
 -- PHP Version: 8.1.2-1ubuntu2.11
 
@@ -31,22 +31,21 @@ CREATE TABLE `Auctions` (
   `auction_id` int(11) NOT NULL,
   `price` float DEFAULT NULL,
   `stock` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ;
 
 --
 -- Dumping data for table `Auctions`
 --
 
 INSERT INTO `Auctions` (`auction_id`, `price`, `stock`) VALUES
-(2, 10, 3),
-(3, 60, 1),
-(4, 60, 10),
-(5, 100, 1),
-(6, 30, 5),
-(7, 30, 7),
-(8, 70, 2),
-(9, 70, 5),
-(10, 41, 3);
+(386, 12, 4),
+(387, 23, 24),
+(388, 10, 21),
+(389, 12, 1),
+(390, 1111, 19),
+(391, 14, 1),
+(392, 50, 2323),
+(393, 23232, 1);
 
 -- --------------------------------------------------------
 
@@ -68,16 +67,13 @@ CREATE TABLE `Game` (
 --
 
 INSERT INTO `Game` (`game_id`, `genre`, `avg_rating`, `title`, `release_date`, `unit_price`) VALUES
-(1, 'Action', NULL, 'Super Mario 64 DS', '2004-01-01', '10.95'),
-(2, 'Strategy', NULL, 'Lumines: Puzzle Fusion', '2004-01-01', '14.95'),
-(3, 'Action,Racing / Driving,Sports', NULL, 'WarioWare Touched!', '2004-01-01', '22.95'),
-(4, 'Sports', NULL, 'Hot Shots Golf: Open Tee', '2004-01-01', '12.95'),
-(5, 'Action', NULL, 'Spider-Man 2', '2004-01-01', '14.95'),
-(6, 'Simulation', NULL, 'The Urbz: Sims in the City', '2004-01-01', '12.95'),
-(7, 'Racing / Driving', NULL, 'Ridge Racer', '2004-01-01', '19.95'),
+(3, 'Action, Racing / Driving, Sports', 8, 'Wario Ware Touched!', '2004-01-01', '24.00'),
+(4, 'Sports', 4, 'Hot Shots Golf: Open Tee', '2004-01-01', '12.95'),
+(6, 'Simulation', 5.5, 'The Urbz: Sims in the City', '2004-01-01', '12.95'),
+(7, 'Racing / Driving', 10, 'Ridge Racer', '2004-01-01', '19.95'),
 (8, 'Strategy', NULL, 'Metal Gear Ac!d', '2004-01-01', '17.95'),
 (9, 'Sports', NULL, 'Madden NFL 2005', '2004-01-01', '8.95'),
-(10, 'Racing / Driving', NULL, 'Pokmon Dash', '2004-01-01', '24.95'),
+(10, 'Racing / Driving', 7, 'Pokmon Dash', '2004-01-01', '24.95'),
 (11, 'Action,Adventure,Role-Playing (RPG)', NULL, 'Dynasty Warriors', '2004-01-01', '14.95'),
 (12, 'Action,Adventure,Racing / Driving,Sports', NULL, 'Feel the Magic XY/XX', '2004-01-01', '8.95'),
 (13, 'Racing / Driving', NULL, 'Ridge Racer DS', '2004-01-01', '9.95'),
@@ -735,11 +731,11 @@ INSERT INTO `Game` (`game_id`, `genre`, `avg_rating`, `title`, `release_date`, `
 (665, 'Action,Simulation,Sports', NULL, 'The BIGS', '2007-01-01', '22.95'),
 (666, 'Action,Racing / Driving', NULL, 'Stuntman: Ignition', '2007-01-01', '16.95'),
 (667, 'Action,Racing / Driving', NULL, 'Mortal Kombat: Armageddon', '2007-01-01', '24.95'),
-(668, 'Action', NULL, 'Def Jam: Icon', '2007-01-01', '16.95');
-INSERT INTO `Game` (`game_id`, `genre`, `avg_rating`, `title`, `release_date`, `unit_price`) VALUES
+(668, 'Action', NULL, 'Def Jam: Icon', '2007-01-01', '16.95'),
 (669, 'Action', NULL, 'Soulcalibur Legends', '2007-01-01', '16.95'),
 (670, 'Sports', NULL, 'Surf\'s Up', '2007-01-01', '16.95'),
-(671, 'Strategy', NULL, 'Planet Puzzle League', '2007-01-01', '17.95'),
+(671, 'Strategy', NULL, 'Planet Puzzle League', '2007-01-01', '17.95');
+INSERT INTO `Game` (`game_id`, `genre`, `avg_rating`, `title`, `release_date`, `unit_price`) VALUES
 (672, 'Racing / Driving,Simulation,Sports', NULL, 'DiRT', '2007-01-01', '17.95'),
 (673, 'Action', NULL, 'TMNT', '2007-01-01', '17.95'),
 (674, 'Action', NULL, 'Soldier of Fortune: Payback', '2007-01-01', '13.95'),
@@ -1289,20 +1285,9 @@ INSERT INTO `Game` (`game_id`, `genre`, `avg_rating`, `title`, `release_date`, `
 --
 
 CREATE TABLE `In_shopping_cart` (
-  `user_id` int(11) NOT NULL,
-  `auction_id` int(11) NOT NULL
+  `user_id` int(11) DEFAULT NULL,
+  `auction_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `In_shopping_cart`
---
-
-INSERT INTO `In_shopping_cart` (`user_id`, `auction_id`) VALUES
-(2, 2),
-(3, 9),
-(4, 4),
-(5, 3),
-(7, 5);
 
 -- --------------------------------------------------------
 
@@ -1312,20 +1297,24 @@ INSERT INTO `In_shopping_cart` (`user_id`, `auction_id`) VALUES
 
 CREATE TABLE `Purchases` (
   `user_id` int(11) NOT NULL,
-  `auction_id` int(11) NOT NULL,
-  `purchase_date` date DEFAULT NULL
+  `purchase_date` date NOT NULL,
+  `game_id` int(11) NOT NULL,
+  `seller_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `Purchases`
 --
 
-INSERT INTO `Purchases` (`user_id`, `auction_id`, `purchase_date`) VALUES
-(2, 2, '2022-10-04'),
-(3, 9, '2022-09-28'),
-(4, 4, '2022-03-07'),
-(5, 3, '2022-04-04'),
-(7, 5, '2022-05-08');
+INSERT INTO `Purchases` (`user_id`, `purchase_date`, `game_id`, `seller_id`) VALUES
+(1, '2023-04-30', 3, 11),
+(1, '2023-04-30', 6, 2),
+(2, '2023-04-30', 4, 11),
+(2, '2023-04-30', 10, 1),
+(3, '2023-04-30', 6, 2),
+(3, '2023-04-30', 7, 2),
+(11, '2023-04-30', 6, 2),
+(11, '2023-04-30', 8, 1);
 
 -- --------------------------------------------------------
 
@@ -1344,18 +1333,52 @@ CREATE TABLE `Reviews` (
 --
 
 INSERT INTO `Reviews` (`user_id`, `game_id`, `rating`) VALUES
-(1, 1, 9),
-(1, 3, 7.8),
-(1, 267, 5.7),
-(2, 9, 2),
-(2, 267, 8),
-(3, 1, 6),
-(3, 9, 4),
-(4, 8, 9.4),
-(5, 2, 6.7),
-(8, 3, 10),
-(9, 1, 7.8),
-(9, 5, 9);
+(1, 3, 8),
+(1, 6, 9),
+(2, 4, 4),
+(2, 10, 7),
+(3, 6, 2),
+(3, 7, 10);
+
+--
+-- Triggers `Reviews`
+--
+DELIMITER $$
+CREATE TRIGGER `update_avg_rating` AFTER INSERT ON `Reviews` FOR EACH ROW BEGIN
+   UPDATE Game
+   SET avg_rating = (
+       SELECT AVG(rating)
+       FROM Reviews
+       WHERE game_id = NEW.game_id
+   )
+   WHERE game_id = NEW.game_id;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `update_avg_rating_2` AFTER UPDATE ON `Reviews` FOR EACH ROW BEGIN
+   UPDATE Game
+   SET avg_rating = (
+       SELECT AVG(rating)
+       FROM Reviews
+       WHERE game_id = NEW.game_id
+   )
+   WHERE game_id = NEW.game_id;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `update_avg_rating_3` AFTER DELETE ON `Reviews` FOR EACH ROW BEGIN
+	UPDATE Game
+    SET avg_rating = (
+        SELECT AVG(rating)
+        FROM Reviews
+        WHERE game_id = OLD.game_id
+    )
+    WHERE game_id = OLD.game_id;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -1373,16 +1396,14 @@ CREATE TABLE `Sells` (
 --
 
 INSERT INTO `Sells` (`user_id`, `auction_id`) VALUES
-(2, 2),
-(3, 3),
-(4, 4),
-(5, 5),
-(6, 7),
-(7, 6),
-(8, 9),
-(9, 8),
-(10, 10),
-(17, 10);
+(1, 388),
+(1, 389),
+(2, 390),
+(2, 391),
+(3, 392),
+(3, 393),
+(11, 386),
+(11, 387);
 
 -- --------------------------------------------------------
 
@@ -1392,7 +1413,7 @@ INSERT INTO `Sells` (`user_id`, `auction_id`) VALUES
 
 CREATE TABLE `Sold_on` (
   `auction_id` int(11) NOT NULL,
-  `game_id` int(11) DEFAULT NULL
+  `game_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1400,15 +1421,14 @@ CREATE TABLE `Sold_on` (
 --
 
 INSERT INTO `Sold_on` (`auction_id`, `game_id`) VALUES
-(3, 1),
-(4, 3),
-(5, 20),
-(10, 20),
-(8, 32),
-(9, 65),
-(7, 75),
-(6, 90),
-(2, 521);
+(386, 3),
+(387, 4),
+(388, 8),
+(389, 10),
+(390, 6),
+(391, 7),
+(392, 9),
+(393, 9);
 
 -- --------------------------------------------------------
 
@@ -2679,7 +2699,7 @@ INSERT INTO `User` (`user_id`, `first_name`, `last_name`, `username`, `p_word`, 
 (15, 'asfd', 'f', 'asdfas', 'asdf', 0),
 (16, 'Aaron', 'Lin', 'alin', 'admin', 1),
 (17, 'Zhuoer', 'Shen', 'stp7kj', 'cs4750', 1),
-(18, 'Yiheng', 'Lin', 'mzu4dm', 'yzlLYH0264', 0);
+(18, 'Yiheng', 'Lin', 'mzu4dm', 'yzlLYH0264', 1);
 
 -- --------------------------------------------------------
 
@@ -2690,15 +2710,13 @@ INSERT INTO `User` (`user_id`, `first_name`, `last_name`, `username`, `p_word`, 
 CREATE TABLE `UserEmail` (
   `email_address` varchar(255) NOT NULL,
   `user_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ;
 
 --
 -- Dumping data for table `UserEmail`
 --
 
 INSERT INTO `UserEmail` (`email_address`, `user_id`) VALUES
-('dog@email.com', NULL),
-('dog@gmail.com', NULL),
 ('carol@yahoo.com', 1),
 ('cpatel@example.com', 1),
 ('enguyen@example.com', 2),
@@ -2731,8 +2749,12 @@ CREATE TABLE `UserPayment` (
 --
 
 INSERT INTO `UserPayment` (`card_number`, `card_type`, `user_id`) VALUES
+(132, 'Master', 11),
+(2310927409, 'Discover', 12),
+(9123742934, 'Master Card', 16),
 (371449635398431, 'American Express', 8),
 (378282246310005, 'American Express', 3),
+(4347690016228653, 'Visa', 17),
 (4539640001166666, 'Visa', 1),
 (4556434509122233, 'Visa', 6),
 (4916550902466762, 'Visa', 4),
@@ -2753,7 +2775,7 @@ INSERT INTO `UserPayment` (`card_number`, `card_type`, `user_id`) VALUES
 CREATE TABLE `UserPhone` (
   `phone_number` bigint(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ;
 
 --
 -- Dumping data for table `UserPhone`
@@ -2771,7 +2793,8 @@ INSERT INTO `UserPhone` (`phone_number`, `user_id`) VALUES
 (5558901234, 8),
 (5559012345, 9),
 (8720938746, 9),
-(5550123456, 10);
+(5550123456, 10),
+(1234567890, 17);
 
 --
 -- Indexes for dumped tables
@@ -2793,42 +2816,44 @@ ALTER TABLE `Game`
 -- Indexes for table `In_shopping_cart`
 --
 ALTER TABLE `In_shopping_cart`
-  ADD PRIMARY KEY (`user_id`,`auction_id`),
-  ADD KEY `auction_id` (`auction_id`);
+  ADD KEY `fk_cart_auction_id` (`auction_id`),
+  ADD KEY `fk_cart_user_id` (`user_id`);
 
 --
 -- Indexes for table `Purchases`
 --
 ALTER TABLE `Purchases`
-  ADD PRIMARY KEY (`user_id`,`auction_id`),
-  ADD KEY `auction_id` (`auction_id`);
+  ADD PRIMARY KEY (`user_id`,`purchase_date`,`game_id`,`seller_id`),
+  ADD KEY `fk_purchase_seller_id` (`seller_id`),
+  ADD KEY `fk_purchase_game_id` (`game_id`);
 
 --
 -- Indexes for table `Reviews`
 --
 ALTER TABLE `Reviews`
   ADD PRIMARY KEY (`user_id`,`game_id`),
-  ADD KEY `game_id` (`game_id`);
+  ADD KEY `fk_review_game_id` (`game_id`);
 
 --
 -- Indexes for table `Sells`
 --
 ALTER TABLE `Sells`
   ADD PRIMARY KEY (`user_id`,`auction_id`),
-  ADD KEY `auction_id` (`auction_id`);
+  ADD KEY `fk_sells_auction_id` (`auction_id`);
 
 --
 -- Indexes for table `Sold_on`
 --
 ALTER TABLE `Sold_on`
-  ADD PRIMARY KEY (`auction_id`),
-  ADD KEY `game_id` (`game_id`);
+  ADD PRIMARY KEY (`auction_id`,`game_id`),
+  ADD KEY `fk_soldon_game_id` (`game_id`);
 
 --
 -- Indexes for table `User`
 --
 ALTER TABLE `User`
-  ADD PRIMARY KEY (`user_id`);
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `username` (`username`);
 
 --
 -- Indexes for table `UserEmail`
@@ -2859,19 +2884,13 @@ ALTER TABLE `UserPhone`
 -- AUTO_INCREMENT for table `Auctions`
 --
 ALTER TABLE `Auctions`
-  MODIFY `auction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=376;
+  MODIFY `auction_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `Game`
 --
 ALTER TABLE `Game`
-  MODIFY `game_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2048;
-
---
--- AUTO_INCREMENT for table `Sells`
---
-ALTER TABLE `Sells`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `game_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2050;
 
 --
 -- AUTO_INCREMENT for table `User`
@@ -2887,36 +2906,38 @@ ALTER TABLE `User`
 -- Constraints for table `In_shopping_cart`
 --
 ALTER TABLE `In_shopping_cart`
-  ADD CONSTRAINT `In_shopping_cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`),
-  ADD CONSTRAINT `In_shopping_cart_ibfk_2` FOREIGN KEY (`auction_id`) REFERENCES `Auctions` (`auction_id`);
+  ADD CONSTRAINT `fk_cart_auction_id` FOREIGN KEY (`auction_id`) REFERENCES `Auctions` (`auction_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_cart_user_id` FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `Purchases`
 --
 ALTER TABLE `Purchases`
-  ADD CONSTRAINT `Purchases_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`),
-  ADD CONSTRAINT `Purchases_ibfk_2` FOREIGN KEY (`auction_id`) REFERENCES `Auctions` (`auction_id`);
+  ADD CONSTRAINT `fk_purchase_game_id` FOREIGN KEY (`game_id`) REFERENCES `Game` (`game_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_purchase_seller_id` FOREIGN KEY (`seller_id`) REFERENCES `User` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_purchase_user_id` FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `Reviews`
 --
 ALTER TABLE `Reviews`
   ADD CONSTRAINT `Reviews_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`),
-  ADD CONSTRAINT `Reviews_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `Game` (`game_id`);
+  ADD CONSTRAINT `Reviews_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `Game` (`game_id`),
+  ADD CONSTRAINT `fk_review_game_id` FOREIGN KEY (`game_id`) REFERENCES `Game` (`game_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `Sells`
 --
 ALTER TABLE `Sells`
-  ADD CONSTRAINT `Sells_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`),
-  ADD CONSTRAINT `Sells_ibfk_2` FOREIGN KEY (`auction_id`) REFERENCES `Auctions` (`auction_id`);
+  ADD CONSTRAINT `fk_sells_auction_id` FOREIGN KEY (`auction_id`) REFERENCES `Auctions` (`auction_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_sells_user_id` FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `Sold_on`
 --
 ALTER TABLE `Sold_on`
-  ADD CONSTRAINT `Sold_on_ibfk_1` FOREIGN KEY (`auction_id`) REFERENCES `Auctions` (`auction_id`),
-  ADD CONSTRAINT `Sold_on_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `Game` (`game_id`);
+  ADD CONSTRAINT `fk_soldon_auction_id` FOREIGN KEY (`auction_id`) REFERENCES `Auctions` (`auction_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_soldon_game_id` FOREIGN KEY (`game_id`) REFERENCES `Game` (`game_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `UserEmail`
