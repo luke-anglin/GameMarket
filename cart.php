@@ -121,6 +121,7 @@ echo '<th><a href="#" class="sort" data-sort="title">Title</a></th>';
 echo '<th><a href="#" class="sort" data-sort="avg_rating">Average Rating</a></th>';
 echo '<th><a href="#" class="sort" data-sort="username">Seller</a></th>';
 echo '<th><a href="#">Remove</a></th>';
+echo '<th><a href="#">Purchase</a></th>';
 echo '</tr></thead>';
 echo '<tbody>';
 
@@ -134,6 +135,11 @@ foreach ($results as $row) {
     echo '<td>' . $row['username'] . '</td>';
     echo '<td><form action="cart.php" method="POST">
     <input type="submit" name="actionBtn" value="Delete" class ="btn btn-danger" />
+    <input type="hidden" name="auction_id" value="' . $row['auction_id'] . '" />
+    </form>
+    </td>';
+    echo '<td><form action="cart.php" method="POST">
+    <button class="btn btn-primary" type="submit" name="actionBtn" value="BuyOne">Buy</button>
     <input type="hidden" name="auction_id" value="' . $row['auction_id'] . '" />
     </form>
     </td>';
@@ -169,7 +175,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     $auction_id = $_POST['auction_id'];
     // $uid is the userid
     deletefromCart($uid, $auction_id);
-    header("refresh:2");
+    header("refresh:3");
+  }
+  if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "BuyOne"))
+  {
+    // Check if user has a payment method on their account
+    $pay = checkPayment($uid);
+    foreach ($pay as $p) {
+      if ($p['p'] < 1)
+      {
+        echo "<script>alert('You have no PAYMENT METHOD on record. Please add one on stats page.');</script>";
+        exit();
+      }
+    }
+
+    // Buys selected game in the shopping cart, "utilizes top card on top of list"
+    $auction_id = $_POST['auction_id'];
+    buyOneInCart($auction_id);
+    header("refresh:3");
+
   }
   if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "Buy"))
   {
@@ -183,10 +207,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
       }
     }
 
-    // Buys all games in the shopping cart
-    // "utilizes top card on top of list"
+    // Buys all games in the shopping cart, "utilizes top card on top of list"
     buyGamesInCart();
-    header("refresh:2");
+    header("refresh:3");
 
   }
 }

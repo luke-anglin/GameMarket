@@ -117,7 +117,7 @@ function getPurchases($id)
 {
     global $db;
     $current_uid = $_SESSION['user_id'];
-    $query = "SELECT purchase_date, game_id, seller_id FROM Purchases WHERE user_id = :id"; 
+    $query = "SELECT purchase_date, game_id, seller_id FROM Purchases WHERE user_id = :id ORDER BY purchase_date DESC"; 
     $statement = $db->prepare($query);
     $statement->bindValue(':id', $id);
     $statement->execute();

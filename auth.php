@@ -153,7 +153,8 @@ if(isset($_POST['username']) && isset($_POST['password'])){
     if($user){
         $_SESSION['user_id'] = $user['user_id'];
         $u_id = $_SESSION['user_id'];
-        echo "Logged in! Session user id is $u_id";
+        echo "Logged in! Welcome $username !";
+        // echo "Logged in! Session user id is $u_id"; Probabally don't want to show user_id for security reasons
     }else{
         echo "Incorrect username or password.";
     }

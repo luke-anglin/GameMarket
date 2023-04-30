@@ -261,7 +261,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
   </div>
 </div>
 
-<!-- Left Section: Purchase History -->
+<!-- Purchase History -->
 <div style="width:95%;float:left;background:#D3D3D3;border:0.5px solid #000;border-radius:10px;margin-left:2.5%;">
   <h4 style="padding-left:18px;padding-top:5px">Purchase History</h4>
   <div style="padding-left:30px;padding-bottom:5px">

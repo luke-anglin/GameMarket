@@ -34,6 +34,109 @@ function checkPayment($user_id)
     return $results;
 }
 
+function buyOneInCart($auction_id) {
+    global $db;
+    $uid = $_SESSION['user_id'];
+
+    // Get info about the Game & the Auction
+    $query = "SELECT auction_id, game_id, stock, user_id
+                FROM Sold_on NATURAL JOIN Auctions NATURAL JOIN Sells
+                WHERE auction_id=:auction_id;"; 
+    $statement = $db->prepare($query);
+    $statement->bindValue(':auction_id', $auction_id);
+    $statement->execute();
+    $results = $statement->fetchAll();
+    $statement->closeCursor();
+
+    // Add game to the purchase table and remove from shopping cart
+    foreach ($results as $result){
+        $seller = $result['user_id'];
+        $game = $result['game_id'];
+        $auction = $result['auction_id'];
+        $stock = $result['stock'];
+        $date = date("Y-m-d");
+
+        // Get title of game and seller username
+        $query = "SELECT title, (SELECT username FROM User WHERE user_id = :seller_id) as sellname
+                    FROM Game
+                    WHERE game_id = :game_id;";
+        $statement = $db->prepare($query);
+        $statement->bindValue(':game_id', $game);
+        $statement->bindValue(':seller_id', $seller);
+        $statement->execute();
+        $names = $statement->fetchAll();
+        $statement->closeCursor();
+        foreach ($names as $n){
+            $game_title = $n['title'];
+            $seller_name = $n['sellname'];
+        }
+
+
+        // Insert into purchases table/make purchase if game was not purchased from the same seller on the same date
+        $query = "SELECT COUNT(*) as purchase_count
+                    FROM Purchases
+                    WHERE user_id = :user_id AND purchase_date = :purchase_date AND game_id = :game_id AND seller_id = :seller_id;";
+        $statement = $db->prepare($query);
+        $statement->bindValue(':user_id', $uid);
+        $statement->bindValue(':purchase_date', $date);
+        $statement->bindValue(':game_id', $game);
+        $statement->bindValue(':seller_id', $seller);
+        $statement->execute();
+        $purchased = $statement->fetchAll();
+        $statement->closeCursor();
+
+        foreach ($purchased as $p){
+            // check if this game from this seller has already been purchased today by this user
+            if ($p['purchase_count'] > 0){
+                $message = 'You have already purchased "' . $game_title . '" from "' . $seller_name . '" today. Please try again tomorrow.';
+                echo "<script>alert('$message');</script>";
+                exit();
+            }
+            else{
+                // Put record into purchase table
+                $query = "INSERT INTO Purchases (user_id, purchase_date, game_id, seller_id)
+                    VALUES (:user_id, :purchase_date, :game_id, :seller_id);";
+                $statement = $db->prepare($query);
+                $statement->bindValue(':user_id', $uid);
+                $statement->bindValue(':purchase_date', $date);
+                $statement->bindValue(':game_id', $game);
+                $statement->bindValue(':seller_id', $seller);
+                $statement->execute();
+                $statement->closeCursor();
+
+                // Delete from shopping cart
+                $query = "DELETE FROM In_shopping_cart
+                            WHERE user_id = :user_id AND auction_id = :auction_id;";
+                $statement = $db->prepare($query);
+                $statement->bindValue(':user_id', $uid);
+                $statement->bindValue(':auction_id', $auction);
+                $statement->execute();
+                $statement->closeCursor();
+
+                // Update the Auction
+                if ($stock == 1){
+                    $query = "DELETE FROM Auctions
+                                WHERE auction_id = :auction_id;";
+                    $statement = $db->prepare($query);
+                    $statement->bindValue(':auction_id', $auction);
+                    $statement->execute();
+                    $statement->closeCursor();
+                }
+                elseif ($stock > 1){
+                    $query = "UPDATE Auctions
+                                SET stock = stock - 1
+                                WHERE auction_id = :auction_id;";
+                    $statement = $db->prepare($query);
+                    $statement->bindValue(':auction_id', $auction);
+                    $statement->execute();
+                    $statement->closeCursor();
+                }
+            }
+        }
+        
+    }
+}
+
 function buyGamesInCart() {
     global $db;
     $uid = $_SESSION['user_id'];
@@ -87,12 +190,14 @@ function buyGamesInCart() {
         $statement->closeCursor();
 
         foreach ($purchased as $p){
+            // check if this game from this seller has already been purchased today by this user
             if ($p['purchase_count'] > 0){
-                $message = 'You have already purchased "' . $game_title . '" from "' . $seller_name . '". Please try again tomorrow.';
+                $message = 'You have already purchased "' . $game_title . '" from "' . $seller_name . '" today. Please try again tomorrow.';
                 echo "<script>alert('$message');</script>";
                 exit();
             }
             else{
+                // Put record into purchase table
                 $query = "INSERT INTO Purchases (user_id, purchase_date, game_id, seller_id)
                     VALUES (:user_id, :purchase_date, :game_id, :seller_id);";
                 $statement = $db->prepare($query);
