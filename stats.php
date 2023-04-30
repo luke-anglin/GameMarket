@@ -112,24 +112,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
       $phone = getUserPhone($u_id);
     }
   }
-  else if ($_SERVER['REQUEST_METHOD'] == 'POST')
+  else if (!empty($_POST['ratingBtn']) && ($_POST['ratingBtn'] == "✓"))
   {
-    if (!empty($_POST['ratingBtn']) && ($_POST['ratingBtn'] == "✓"))
-    {
-      $newRating = $_POST['newRating'];
-  
-      if (empty($newRating)) {
-        deleteRating($u_id, $_POST['game_id']);
-      } else {
-        if ($newRating > 10) {
-          $newRating = 10;
-        } else if ($newRating < 1) {
-          $newRating = 1;
-        }
-        addRating($newRating, $u_id, $_POST['game_id']);
+    $newRating = $_POST['newRating'];
+
+    if (empty($newRating)) {
+      deleteRating($u_id, $_POST['game_id']);
+    } else {
+      if ($newRating > 10) {
+        $newRating = 10;
+      } else if ($newRating < 1) {
+        $newRating = 1;
       }
-      $phone = getRating($u_id, $_POST['game_id']);
+      addRating($newRating, $u_id, $_POST['game_id']);
     }
+    $phone = getRating($u_id, $_POST['game_id']);
   }
   else if (!empty($_POST['cardBtn']) && ($_POST['cardBtn'] == "X"))
   {
