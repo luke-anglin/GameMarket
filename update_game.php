@@ -14,18 +14,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $title = $row[0]['title'];
         $unit_price = $row[0]['unit_price'];
     } else {
- // TODO: PDO SQL query to update row in Game table with form data
- $stmt = $db->prepare("UPDATE Game SET title = :title, unit_price = :unit_price, genre = :genre WHERE game_id = :game_id");
-echo "Updating table, now the title is" . $_POST['title'] . " and the unit price is " . $_POST['unit_price'] . " and the genre is " . $_POST['genre'] . "<br>"; 
- $stmt->bindParam(':title', $_POST['title']);
- $stmt->bindParam(':unit_price', $_POST['unit_price']);
- $stmt->bindParam(':genre', $_POST['genre']);
- $stmt->bindParam(':game_id', $_POST['game_id']);
- $stmt->execute();
+        // TODO: PDO SQL query to update row in Game table with form data
+        $stmt = $db->prepare("UPDATE Game SET title = :title, unit_price = :unit_price, genre = :genre WHERE game_id = :game_id");
+        $stmt->bindParam(':title', $_POST['title']);
+        $stmt->bindParam(':unit_price', $_POST['unit_price']);
+        $stmt->bindParam(':genre', $_POST['genre']);
+        $stmt->bindParam(':game_id', $_POST['game_id']);
+        $stmt->execute();
+        $message = "Updating table, now the title is " . $_POST['title'] . " and the unit price is " . $_POST['unit_price'] . " and the genre is " . $_POST['genre'] . ". You will be redirected back in 8 seconds."; 
+        echo "<script>alert('$message');</script>";
+        sleep(8);
+        header("Location:admin.php"); exit;
     }
-    
 }
 ?>
+
 <form action="update_game.php" method="POST">
   <div class="form-group">
     <label for="title">Title</label>

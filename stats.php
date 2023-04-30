@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     } 
     else 
     {
-      echo "Error: Email address must include '@' symbol";
+      echo "<script>alert('Error: Email address must include @ symbol');</script>";
     }
   }  
   else if (!empty($_POST['phoneBtn']) && ($_POST['phoneBtn'] == "X"))
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
   {
     $newPhone = $_POST['newPhone'];
     if(strlen($newPhone) != 10 || !is_numeric($newPhone)) {
-      echo "Please enter a 10-digit phone number";
+      echo "<script>alert('Please enter a 10-digit phone number');</script>";
     } else {
       addPhone($newPhone, $u_id);
       $phone = getUserPhone($u_id);
