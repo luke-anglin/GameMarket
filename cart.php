@@ -77,22 +77,33 @@ if (isset($_POST['filter'])) {
     $filterValue = $_POST['filterValue'];
 
     // Prepare the SQL statement to retrieve filtered data from the Game table
-    $stmt = $db->prepare("SELECT auction_id, game_id, price, title, avg_rating, stock, (SELECT username FROM Sells NATURAL JOIN User WHERE auction_id = (SELECT auction_id FROM In_shopping_cart WHERE user_id = $uid)) as username
-    FROM In_shopping_cart NATURAL LEFT JOIN Sold_on NATURAL LEFT JOIN Game NATURAL LEFT JOIN Auctions
-    WHERE user_id = $uid;");
+    $stmt = $db->prepare("SELECT q1.*,q2.username
+    FROM (SELECT auction_id, game_id, price, title, avg_rating, stock FROM 
+          In_shopping_cart NATURAL LEFT JOIN Sold_on NATURAL LEFT JOIN Game NATURAL LEFT JOIN Auctions
+         WHERE user_id=$uid) AS q1,
+         (SELECT auction_id, username
+         FROM Sells NATURAL JOIN User
+        WHERE auction_id IN (SELECT auction_id FROM In_shopping_cart WHERE user_id = $uid)) AS q2
+    WHERE q1.auction_id=q2.auction_id AND price < :filterValue AND game_id IN (SELECT game_id FROM Sold_on);");
 
     // Bind the filter value parameter to the SQL statement
     $stmt->bindValue(':filterValue', $filterValue, PDO::PARAM_INT);
 } else {
     // Prepare the SQL statement to retrieve data from the Game table
-    $stmt = $db->prepare("SELECT auction_id, game_id, price, title, avg_rating, stock, (SELECT username FROM Sells NATURAL JOIN User WHERE auction_id = (SELECT auction_id FROM In_shopping_cart WHERE user_id = $uid)) as username
-    FROM In_shopping_cart NATURAL LEFT JOIN Sold_on NATURAL LEFT JOIN Game NATURAL LEFT JOIN Auctions
-    WHERE user_id = $uid;");
+    $stmt = $db->prepare("SELECT q1.*,q2.username
+    FROM (SELECT auction_id, game_id, price, title, avg_rating, stock FROM 
+          In_shopping_cart NATURAL LEFT JOIN Sold_on NATURAL LEFT JOIN Game NATURAL LEFT JOIN Auctions
+         WHERE user_id=$uid) AS q1,
+    	(SELECT auction_id, username
+         FROM Sells NATURAL JOIN User
+        WHERE auction_id IN (SELECT auction_id FROM In_shopping_cart WHERE user_id=$uid)) AS q2
+    WHERE q1.auction_id=q2.auction_id;");
 }
 
 // Execute the statement and fetch the results
 $stmt->execute();
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
 
 // Create the HTML table using Bootstrap classes
 echo '<form method="POST">';
@@ -162,6 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
   }
   if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "Buy"))
   {
+    echo "here";
     // Check if user has a payment method on their account
     $pay = checkPayment($uid);
     foreach ($pay as $p) {

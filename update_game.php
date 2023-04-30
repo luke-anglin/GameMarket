@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Execute the statement
     $stmt->execute();
+    $stmt->closeCursor();
 
     // Redirect back to the home page
     // header('Location: home.php');

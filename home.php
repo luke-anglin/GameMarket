@@ -62,7 +62,7 @@ if (isset($_POST['filter'])) {
 
     // Prepare the SQL statement to retrieve filtered data from the Game table
     $stmt = $db->prepare("SELECT auction_id, game_id, price, title, avg_rating, username, stock
-    FROM Game NATURAL RIGHT JOIN Sold_on NATURAL LEFT JOIN Auctions NATURAL LEFT JOIN Sells NATURAL LEFT JOIN User WHERE unit_price < :filterValue AND game_id IN (SELECT game_id FROM Sold_on);");
+    FROM Game NATURAL RIGHT JOIN Sold_on NATURAL LEFT JOIN Auctions NATURAL LEFT JOIN Sells NATURAL LEFT JOIN User WHERE price < :filterValue AND game_id IN (SELECT game_id FROM Sold_on);");
 
     // Bind the filter value parameter to the SQL statement
     $stmt->bindValue(':filterValue', $filterValue, PDO::PARAM_INT);
@@ -180,10 +180,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     // Check if Auction is already in your shopping cart
     $stmt = $db->prepare("SELECT EXISTS 
     (SELECT 1 FROM In_shopping_cart WHERE user_id = :user_id AND auction_id = :auction_id) as e;");
-    $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-    $stmt->bindValue(':auction_id', $auction_id, PDO::PARAM_INT);
+    $stmt->bindValue(':user_id', $user_id);
+    $stmt->bindValue(':auction_id', $auction_id);
     $stmt->execute();
-    $exists = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $exists = $stmt->fetchAll();
     foreach ($exists as $e) {
       if ($e['e'] == 1){
         echo "<script>alert('This game is already in your shopping cart. Not re-added');</script>"; 
@@ -193,17 +193,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     $stmt->closeCursor();
 
     // echo "<p>Results: " . $results . "</p>";
-    foreach ($results as $row) {
       // echo "<p> gonna run this with auction id " . $row['auction_id'] . "</p>";
-      $stmt = $db -> prepare ("INSERT INTO In_shopping_cart (user_id, auction_id) VALUES (:user_id, :auction_id)");
-      $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-      $stmt->bindValue(':auction_id', $row['auction_id'], PDO::PARAM_INT);
-      $stmt->execute();
-      $stmt->closeCursor();
-    } 
+
+    // Add the game to shoppin cart
+    $stmt = $db -> prepare ("INSERT INTO In_shopping_cart (user_id, auction_id) VALUES (:user_id, :auction_id)");
+    $stmt->bindValue(':user_id', $user_id);
+    $stmt->bindValue(':auction_id', $auction_id);
+    $stmt->execute();
+    $stmt->closeCursor();
+    
+    $message = "You added $title to your shopping cart.";
+    echo "<script>alert('$message');</script>";
   }
-  $message = "You added $title to your shopping cart.";
-  echo "<script>alert('$message');</script>";
 }
 
 ?>
