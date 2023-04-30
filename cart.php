@@ -105,6 +105,7 @@ echo '<th><a href="#" class="sort" data-sort="stock">Stock</a></th>';
 echo '<th><a href="#" class="sort" data-sort="title">Title</a></th>';
 echo '<th><a href="#" class="sort" data-sort="avg_rating">Average Rating</a></th>';
 echo '<th><a href="#" class="sort" data-sort="username">Seller</a></th>';
+echo '<th><a href="#">Remove</a></th>';
 echo '</tr></thead>';
 echo '<tbody>';
 
@@ -116,6 +117,11 @@ foreach ($results as $row) {
     echo '<td>' . $row['title'] . '</td>';
     echo '<td>' . $row['avg_rating'] . '</td>';
     echo '<td>' . $row['username'] . '</td>';
+    echo '<td><form action="cart.php" method="POST">
+    <input type="submit" name="actionBtn" value="Delete" class ="btn btn-danger" />
+    <input type="hidden" name="auction_id" value="' . $row['auction_id'] . '" />
+    </form>
+    </td>';
     echo '</tr>';
 }
 
