@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     } 
     else 
     {
-      echo "<script>alert('Error: Email address must include @ symbol');</script>";
+      echo "Error: Email address must include '@' symbol";
     }
   }  
   else if (!empty($_POST['phoneBtn']) && ($_POST['phoneBtn'] == "X"))
@@ -106,24 +106,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
   {
     $newPhone = $_POST['newPhone'];
     if(strlen($newPhone) != 10 || !is_numeric($newPhone)) {
-      echo "<script>alert('Please enter a 10-digit phone number');</script>";
+      echo "Please enter a 10-digit phone number";
     } else {
       addPhone($newPhone, $u_id);
       $phone = getUserPhone($u_id);
     }
   }
-  else if (!empty($_POST['ratingBtn']) && ($_POST['ratingBtn'] == "✓"))
+  else if ($_SERVER['REQUEST_METHOD'] == 'POST')
   {
-    if ($_POST['newRating'] > 10)
+    if (!empty($_POST['ratingBtn']) && ($_POST['ratingBtn'] == "✓"))
     {
-      $_POST['newRating'] = 10;
+      $newRating = $_POST['newRating'];
+  
+      if (empty($newRating)) {
+        deleteRating($u_id, $_POST['game_id']);
+      } else {
+        if ($newRating > 10) {
+          $newRating = 10;
+        } else if ($newRating < 1) {
+          $newRating = 1;
+        }
+        addRating($newRating, $u_id, $_POST['game_id']);
+      }
+      $phone = getRating($u_id, $_POST['game_id']);
     }
-    else if ($_POST['newRating'] < 1)
-    {
-      $_POST['newRating'] = 1;
-    }
-    addRating($_POST['newRating'], $u_id, $_POST['game_id']);
-    $phone = getRating($u_id, $_POST['game_id']);
   }
   else if (!empty($_POST['cardBtn']) && ($_POST['cardBtn'] == "X"))
   {
@@ -343,7 +349,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
           <td>
             <form action="stats.php" method="post">
               <div class="form-group" style="display:flex">
-                <input type="text" class="form-control" name="newRating" placeholder="Add Rating" required />
+                <input type="number" class="form-control" name="newRating" placeholder="Add Rating" />
                 <input type="hidden" name="game_id" value="<?php echo $item['game_id']; ?>" />
                 <button type="submit" name="ratingBtn" value="✓" class="btn btn-success" style="margin-left:10px">✓</button>
               </div>
