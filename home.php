@@ -76,6 +76,7 @@ if (isset($_POST['filter'])) {
 // Execute the statement and fetch the results
 $stmt->execute();
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
 
 // Create the HTML table using Bootstrap classes
 echo '<form method="POST">';
@@ -118,6 +119,22 @@ foreach ($results as $row) {
 
 echo '</tbody></table>';
 
+// Include DataTables jQuery plugin and initialize the table
+echo '<script src="//cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>';
+echo '<script>
+$(document).ready(function() {
+    $("#gameTable").DataTable({
+        "order": []
+    });
+    
+    // Add click event handlers for the column headers to sort by the clicked column
+    $(".sort").on("click", function() {
+        var column = $(this).data("sort");
+        $("#gameTable").DataTable().order([column, "asc"]).draw();
+    });
+});
+</script>';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST')
 {
   if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "AddToCart"))
@@ -158,6 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         exit(); 
       }
     }
+    $stmt->closeCursor();
 
     // Check if Auction is already in your shopping cart
     $stmt = $db->prepare("SELECT EXISTS 
@@ -172,6 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         exit(); 
       }
     }
+    $stmt->closeCursor();
 
     // echo "<p>Results: " . $results . "</p>";
     foreach ($results as $row) {
@@ -180,30 +199,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
       $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
       $stmt->bindValue(':auction_id', $row['auction_id'], PDO::PARAM_INT);
       $stmt->execute();
+      $stmt->closeCursor();
     } 
   }
   $message = "You added $title to your shopping cart.";
   echo "<script>alert('$message');</script>";
 }
 
-
-
-
-// Include DataTables jQuery plugin and initialize the table
-echo '<script src="//cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>';
-echo '<script>
-$(document).ready(function() {
-    $("#gameTable").DataTable({
-        "order": []
-    });
-    
-    // Add click event handlers for the column headers to sort by the clicked column
-    $(".sort").on("click", function() {
-        var column = $(this).data("sort");
-        $("#gameTable").DataTable().order([column, "asc"]).draw();
-    });
-});
-</script>';
 ?>
 
 

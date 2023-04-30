@@ -56,6 +56,7 @@
 
 <!-- Connect to database -->
 <?php require "connect.php" ?>
+<?php require("cart-db.php"); ?>
 
 <?php session_start(); $uid = $_SESSION['user_id']; ?>
 
@@ -130,8 +131,6 @@ foreach ($results as $row) {
 
 echo '</tbody></table>';
 
-
-
 // Include DataTables jQuery plugin and initialize the table
 echo '<script src="//cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>';
 echo '<script>
@@ -147,11 +146,47 @@ $(document).ready(function() {
     });
 });
 </script>';
-?>
-<form method="post" action="cart-db.php">
-    <button class="btn btn-primary" type="submit">Buy games</button>
-</form>
 
+echo '<form method="POST">
+<button class="btn btn-primary" type="submit"name="actionBtn" value="Buy">Buy All Games</button>
+</form>';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST')
+{
+  if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "Delete"))
+  {
+    $auction_id = $_POST['auction_id'];
+    // $uid is the userid
+    deletefromCart($uid, $auction_id);
+    header("refresh:0");
+  }
+  if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "Buy"))
+  {
+    // Check if user has a payment method on their account
+    $pay = checkPayment($uid);
+    foreach ($pay as $p) {
+      if ($p['p'] < 1)
+      {
+        echo "<script>alert('You have no PAYMENT METHOD on record. Please add one on stats page.');</script>";
+        exit();
+      }
+    }
+
+    // Buys all games in the shopping cart
+    // "utilizes top card on top of list"
+    buyGamesInCart();
+    header("refresh:0");
+
+  }
+}
+
+?>
+
+<!-- 
+<form method="post">
+    <button class="btn btn-primary" type="submit"name="actionBtn" value="Buy">Buy games</button>
+</form>
+-->
 
 </body>
 </html>
