@@ -31,9 +31,6 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
-    <li class="nav-item">
-        <a class="nav-link" href="catalog.php">Catalog</a>
-      </li>
       <li class="nav-item">
         <a class="nav-link" href="home.php">Auctions</a>
       </li>
@@ -102,6 +99,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
   {
     addPhone($_POST['newPhone'], $u_id);
     $phone = getUserPhone($u_id);
+  }
+  else if (!empty($_POST['ratingBtn']) && ($_POST['ratingBtn'] == "✓"))
+  {
+    addRating($_POST['newRating'], $u_id, $_POST['game_id']);
+    $phone = getRating($u_id, $_POST['game_id']);
   }
 }
 ?>
@@ -208,14 +210,84 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 </div>
 
 <!-- Left Section: Purchase History -->
-<div style="width:47.5%;float:left;background:#D3D3D3;border:0.5px solid #000;border-radius:10px;margin-left:2.5%;">
+<div style="width:95%;float:left;background:#D3D3D3;border:0.5px solid #000;border-radius:10px;margin-left:2.5%;">
   <h4 style="padding-left:18px;padding-top:5px">Purchase History</h4>
+  <div style="padding-left:30px;padding-bottom:5px">
+
+    <!-- Get Account Info -->
+    <?php $purchase = getPurchases($u_id)?>
+
+    <!-- Display Account Info -->
+    <table class="purchase-history">
+    <style>
+      .purchase-history {
+        border-collapse: collapse;
+        width: 100%;
+        table-layout: fixed;
+      }
+
+      .purchase-history th, .purchase-history td {
+        text-align: left;
+        padding: 8px;
+      }
+
+      .purchase-history th:nth-child(1), .purchase-history td:nth-child(1) {
+        width: 20%;
+      }
+
+      .purchase-history th:nth-child(2), .purchase-history td:nth-child(2) {
+        width: 25%;
+      }
+
+      .purchase-history th:nth-child(3), .purchase-history td:nth-child(3) {
+        width: 20%;
+      }
+
+      .purchase-history th:nth-child(4), .purchase-history td:nth-child(4) {
+        width: 15%;
+      }
+
+      .purchase-history th:nth-child(5), .purchase-history td:nth-child(5) {
+        width: 20%;
+      }
+    </style>
+    
+    <thead>
+      <tr style="background-color:#B0B0B0">
+        <th>Purchase Date</th>
+        <th>Game</th>
+        <th>Seller</th>
+        <th>Rating</th>
+        <th>Edit Rating (1-10)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php foreach ($purchase as $item): ?>
+        <tr>
+          <td><?php echo $item["purchase_date"] ?></td>
+          <?php $gameTitle = getGameTitle($item["game_id"])?>
+          <td><?php echo $gameTitle["title"] ?></td>
+          <?php $username = getUsername($item["seller_id"])?>
+          <td><?php echo $username["username"] ?></td>
+          <?php $purchase = getRating($u_id, $item["game_id"])?>
+          <td><?php echo $purchase["rating"]?></td>
+          <td>
+            <form action="stats.php" method="post">
+              <div class="form-group" style="display:flex">
+                <input type="text" class="form-control" name="newRating" placeholder="Add Rating" required />
+                <input type="hidden" name="game_id" value="<?php echo $item['game_id']; ?>" />
+                <button type="submit" name="ratingBtn" value="✓" class="btn btn-success" style="margin-left:10px">✓</button>
+              </div>
+            </form>
+          </td>
+        </tr>
+      <?php endforeach; ?>
+    </tbody>
+    </table>
+
+  </div>
 </div>
 
-<!-- Right Section: Market Stats -->
-<div style="width:47.5%;float:right;background:#D3D3D3;border:0.5px solid #000;border-radius:10px;margin-right:2.5%;">
-  <h4 style="padding-left:18px;padding-top:5px">Market Stats</h4>
-</div>
 
 </body>
 </html>
