@@ -84,13 +84,13 @@ if (isset($_POST['filter'])) {
     $filterValue = $_POST['filterValue'];
 
     // Prepare the SQL statement to retrieve filtered data from the Game table
-    $stmt = $db->prepare("SELECT game_id, unit_price, title FROM Game WHERE unit_price < :filterValue AND game_id;");
+    $stmt = $db->prepare("SELECT game_id, unit_price, title, release_date, genre FROM Game WHERE unit_price < :filterValue AND game_id;");
 
     // Bind the filter value parameter to the SQL statement
     $stmt->bindValue(':filterValue', $filterValue, PDO::PARAM_INT);
 } else {
     // Prepare the SQL statement to retrieve data from the Game table
-    $stmt = $db->prepare("SELECT game_id, unit_price, title
+    $stmt = $db->prepare("SELECT game_id, unit_price, title, release_date, genre
     FROM Game
     WHERE game_id;");
 }
@@ -110,7 +110,11 @@ echo '<table id="gameTable" class="table table-striped">';
 echo '<thead><tr>';
 echo '<th><a href="#" class="sort" data-sort="unit_price">Unit Price</a></th>';
 echo '<th><a href="#" class="sort" data-sort="title">Title</a></th>';
-echo '<th>Action</th>';
+echo '<th><a href="#" class="sort" data-sort="avg_rating">Release Date</a></th>';
+echo '<th><a href="#" class="sort" data-sort="Genre">Genre</a></th>';
+
+echo '<th>Action1</th>';
+echo '<th>Action2</th>';
 echo '</tr></thead>';
 echo '<tbody>';
 
@@ -118,11 +122,17 @@ foreach ($results as $row) {
   echo '<tr>';
   echo '<td>' . $row['unit_price'] . '</td>';
   echo '<td>' . $row['title'] . '</td>';
+  echo '<td>' . $row['genre'] . '</td>';
+  echo '<td>' . $row['release_date'] . '</td>';
+
   echo '<td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#gameModal' . $row['game_id'] . '">Update</button></td>';
+  echo '<td><button type="submit" name="delete" value="'.$row['game_id'].'" />Delete</button></td>"';
   echo '<td><form action="home.php" method="POST">
   <input type="hidden" name="game_id" value="' . $row['game_id'] . '" />
   <input type="hidden" name="title" value="' . $row['title'] . '" />
   <input type="hidden" name="title" value="' . $row['unit_price'] . '" />
+  <input type="hidden" name="release_date" value="' . $row['release_date'] . '" />
+  <input type="hidden" name="Genre" value="' . $row['Genre'] . '" />
   </form>
   </td>';
   echo '</tr>';
@@ -147,8 +157,12 @@ foreach ($results as $row) {
   echo '<input type="number" class="form-control" name="unit_price" value="' . $row['unit_price'] . '">';
   echo '</div>';
   echo '<div class="form-group">';
-  echo '<label for="delete">Delete</label>';
-  echo '<input type="checkbox" name="delete">';
+  echo '<label for="release_date">release_date</label>';
+  echo '<input type="text" class="form-control" name="release_date" value="' . $row['release_date'] . '">';
+  echo '</div>';
+  echo '<div class="form-group">';
+  echo '<label for="genre">genre</label>';
+  echo '<input type="text" class="form-control" name="genre" value="' . $row['genre'] . '">';
   echo '</div>';
   echo '<button type="submit" class="btn btn-primary">Save Changes</button>';
   echo '</form>';
