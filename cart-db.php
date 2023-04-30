@@ -39,9 +39,10 @@ function buyGamesInCart() {
     $uid = $_SESSION['user_id'];
     
     // Get all auctions/game in the shopping cart
-    $query = "SELECT q1.*, q2.*
+    $query = "SELECT q1.*, q2.user_id
                 FROM (SELECT auction_id, game_id, stock FROM In_shopping_cart NATURAL LEFT JOIN Sold_on NATURAL LEFT JOIN Auctions WHERE user_id=:user_id) AS q1,
-                (SELECT user_id FROM Sells WHERE auction_id IN (SELECT auction_id FROM In_shopping_cart WHERE user_id = :user_id)) AS q2;"; 
+                (SELECT auction_id, user_id FROM Sells WHERE auction_id IN (SELECT auction_id FROM In_shopping_cart WHERE user_id=:user_id)) AS q2
+                WHERE q1.auction_id=q2.auction_id;"; 
     $statement = $db->prepare($query);
     $statement->bindValue(':user_id', $uid);
     $statement->execute();
