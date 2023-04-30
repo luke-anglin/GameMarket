@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
       />        
     </div>  
 	<div class="row mb-3 mx-3">
-      Game:
+      Game Title (Copy from Catalog EXACTLY):
       <input type="text" class="form-control" name="game" required 
           value="<?php if ($auction_info_to_update!=null) echo $auction_info_to_update['game'];?>"
       />        
