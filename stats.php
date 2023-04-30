@@ -32,9 +32,6 @@
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" href="catalog.php">Catalog</a>
-      </li>
-      <li class="nav-item">
         <a class="nav-link" href="home.php">Auctions</a>
       </li>
       <li class="nav-item">
@@ -105,6 +102,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
   }
   else if (!empty($_POST['ratingBtn']) && ($_POST['ratingBtn'] == "✓"))
   {
+    if ($_POST['newRating'] > 10)
+    {
+      $_POST['newRating'] = 10;
+    }
+    else if ($_POST['newRating'] < 1)
+    {
+      $_POST['newRating'] = 1;
+    }
     addRating($_POST['newRating'], $u_id, $_POST['game_id']);
     $phone = getRating($u_id, $_POST['game_id']);
   }
@@ -261,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
   </div>
 </div>
 
-<!-- Purchase History -->
+<!-- Left Section: Purchase History -->
 <div style="width:95%;float:left;background:#D3D3D3;border:0.5px solid #000;border-radius:10px;margin-left:2.5%;">
   <h4 style="padding-left:18px;padding-top:5px">Purchase History</h4>
   <div style="padding-left:30px;padding-bottom:5px">
