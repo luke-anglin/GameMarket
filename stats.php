@@ -105,6 +105,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     addRating($_POST['newRating'], $u_id, $_POST['game_id']);
     $phone = getRating($u_id, $_POST['game_id']);
   }
+  else if (!empty($_POST['cardBtn']) && ($_POST['cardBtn'] == "X"))
+  {
+    deletePayment($_POST['delete_card_type'], $_POST['delete_card_number']);
+    $payment = getUserPayment($u_id);
+  }
+  else if (!empty($_POST['cardBtn']) && ($_POST['cardBtn'] == "✓"))
+  {
+    addPayment($_POST['newPaymentType'], $_POST['newPaymentNumber'], $u_id);
+    $payment = getUserPayment($u_id);
+  }
 }
 ?>
 
@@ -117,6 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     <?php $info = getUserInfo($u_id)?>
     <?php $email = getUserEmail($u_id)?>
     <?php $phone = getUserPhone($u_id)?>
+    <?php $payment = getUserPayment($u_id)?>
 
     <!-- Display Account Info -->
     <?php foreach ($info as $user_info): ?>
@@ -203,6 +214,44 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
           </form>
         </tr>
       </table>
+      <!-- Table for Payment -->
+      <table>
+        <thead>
+        <tr style="background-color:#B0B0B0">
+          <th>Payment(s)</th>
+          <th></th>  
+          <th></th>     
+        </tr>
+        </thead>
+        <?php foreach ($payment as $pt): ?>
+          <tr>
+            <td><?php echo $pt['card_type']; ?></td>
+            <td><?php echo $pt['card_number']; ?></td>
+            <td align="right">
+              <form action="stats.php" method="post">
+                <input type="submit" name="cardBtn" value="X" class="btn btn-danger" />
+                <input type="hidden" name="delete_card_type"
+                      value="<?php echo $pt['card_type']; ?>" />
+                <input type="hidden" name="delete_card_number"
+                      value="<?php echo $pt['card_number']; ?>" />
+              </form>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+        <tr>
+          <form action="stats.php" method="post">
+            <td>
+              <input type="text" class="form-control" name="newPaymentType" placeholder="Payment Type" required />
+            </td>
+            <td>
+              <input type="text" class="form-control" name="newPaymentNumber" placeholder="Payment Number" required />
+            </td>
+            <td align="right">
+              <input type="submit" name="cardBtn" value="✓" class="btn btn-success" />
+            </td>
+          </form>
+        </tr>
+      </table>
 
     </div>
 
@@ -251,7 +300,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         width: 20%;
       }
     </style>
-    
+
     <thead>
       <tr style="background-color:#B0B0B0">
         <th>Purchase Date</th>
