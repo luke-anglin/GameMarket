@@ -44,13 +44,25 @@ function buyGamesInCart() {
             WHERE auction_id = $auction_id"); 
             $stmt -> execute();
             echo "<p>Executed!</p>";
-
+            // add purhcase 
+            $stmt = $db -> prepare ("INSERT INTO Purchases(user_id, auction_id, purchase_date) VALUES ($uid, $auction_id, CURDATE())");
+            $stmt->execute();
+            
         } else {
             echo "<p>Stock is == 1. Deleting auction and corresponding tables.</p>";
             // Tables to make changes to: 
             // Auctions - delete the auction where auction_Id = this auction_id 
             // Sold_on - delete where auction_id = this auction_id 
             // Sells - delete where auction id = this auction id 
+            // Get everything from purchases 
+            // add new purchase
+            echo "purchase insert with uid $uid and auction_id $auction_id<br>";
+            $stmt = $db -> prepare ("INSERT INTO Purchases(user_id, auction_id, purchase_date) VALUES ($uid, $auction_id, CURDATE())");
+            $stmt -> execute();
+            
+            $stmt = $db -> prepare("DELETE FROM In_shopping_cart
+            WHERE auction_id = $auction_id;"); 
+            $stmt -> execute(); 
             $stmt = $db -> prepare("DELETE FROM Sells
             WHERE auction_id = $auction_id;"); 
             $stmt -> execute(); 
@@ -59,13 +71,9 @@ function buyGamesInCart() {
             $stmt -> execute();
             $stmt = $db -> prepare("DELETE FROM Auctions 
             WHERE auction_id = $auction_id;");
-            $stmt -> execute(); 
-        }
-
+            $stmt -> execute();     
+        }     
     }
-    //redirect home
-    // header('Location: home.php');
-
 }
 
 buyGamesInCart(); 
