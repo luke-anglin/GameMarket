@@ -59,23 +59,59 @@
 
 <!-- Connect to database -->
 <?php require "connect.php" ?>
+<?php require "admin-db.php" ?>
 <?php session_start() ?>
+
 <?php
-$uid = $_SESSION['user_id'];
-$ad = $db->prepare("SELECT admin FROM User WHERE user_id = $uid");
-$ad->execute();
-$adminValue = $ad->fetch(PDO::FETCH_ASSOC);
 if (!isset($_SESSION['user_id'])) {
   echo "You Do Not Have Access To This Page: Please Log In";
   exit;
 }
+$uid = $_SESSION['user_id'];
+$ad = $db->prepare("SELECT admin FROM User WHERE user_id = $uid");
+$ad->execute();
+$adminValue = $ad->fetch(PDO::FETCH_ASSOC);
 if ($adminValue["admin"] != 1) {
   echo "You Do Not Have Access To This Page: You are not admin";
   exit;
 }
+
 ?>
 
-<h2>Update Available Games</h2>
+<!-- Add A New Game -->
+<div class="container">
+  <h1>Add A New Game to Catalog</h1>  
+
+  <form name="mainForm" action="admin.php" method="post">   
+  <div class="row mb-3 mx-3">
+      Unit Price:
+      <input type="text" class="form-control" name="unit_price" placeholder="$USD" required
+      />        
+  </div>  
+  <div class="row mb-3 mx-3">
+      Title:
+      <input type="text" class="form-control" name="title" required
+      />        
+  </div>  
+	<div class="row mb-3 mx-3">
+      Release Date:
+      <input type="text" class="form-control" name="release_date" placeholder="YYYY-MM-DD" required
+      />        
+  </div>  
+  <div class="row mb-3 mx-3">
+      Genre:
+      <input type="text" class="form-control" name="genre" required
+      />        
+  </div>  
+	<div class="row mb-3 mx-3">
+      <input type="submit" class="btn btn-primary" name="actionBtn" value="Add Game" title="click to insert game" />        
+    </div> 
+  </form>     
+
+</div>
+
+<!-- Update Games -->
+<h2>Update Available Games In Catalog</h2>
 
 <?php 
 
@@ -98,6 +134,7 @@ if (isset($_POST['filter'])) {
 // Execute the statement and fetch the results
 $stmt->execute();
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
 
 // Create the HTML table using Bootstrap classes
 echo '<form method="POST">';
@@ -110,11 +147,11 @@ echo '<table id="gameTable" class="table table-striped">';
 echo '<thead><tr>';
 echo '<th><a href="#" class="sort" data-sort="unit_price">Unit Price</a></th>';
 echo '<th><a href="#" class="sort" data-sort="title">Title</a></th>';
-echo '<th><a href="#" class="sort" data-sort="avg_rating">Release Date</a></th>';
-echo '<th><a href="#" class="sort" data-sort="Genre">Genre</a></th>';
+echo '<th><a href="#" class="sort" data-sort="release_date">Release Date</a></th>';
+echo '<th><a href="#" class="sort" data-sort="genre">Genre</a></th>';
 
-echo '<th>Action1</th>';
-echo '<th>Action2</th>';
+echo '<th>Update</th>';
+echo '<th>Remove</th>';
 echo '</tr></thead>';
 echo '<tbody>';
 
@@ -122,10 +159,21 @@ foreach ($results as $row) {
   echo '<tr>';
   echo '<td>' . $row['unit_price'] . '</td>';
   echo '<td>' . $row['title'] . '</td>';
-  echo '<td>' . $row['genre'] . '</td>';
   echo '<td>' . $row['release_date'] . '</td>';
-
+  echo '<td>' . $row['genre'] . '</td>';
+  
+  // Update Game Button
   echo '<td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#gameModal' . $row['game_id'] . '">Update</button></td>';
+  // Delete Game Button
+  echo '<td><form action="admin.php" method="POST">
+  <input type="submit" name="actionBtn" value="Delete" class ="btn btn-danger" />
+  <input type="hidden" name="game_id" value="' . $row['game_id'] . '" />
+  <a href="admin.php" /a>
+  </form>
+  </td>';
+  echo '</tr>';
+
+  /*
   echo '<td><button type="submit" name="delete" value="'.$row['game_id'].'" />Delete</button></td>"';
   echo '<td><form action="home.php" method="POST">
   <input type="hidden" name="game_id" value="' . $row['game_id'] . '" />
@@ -136,15 +184,19 @@ foreach ($results as $row) {
   </form>
   </td>';
   echo '</tr>';
+
+  // Update Game Pop-Up
   echo '<div class="modal fade" id="gameModal' . $row['game_id'] . '" tabindex="-1" role="dialog" aria-labelledby="gameModalLabel' . $row['game_id'] . '" aria-hidden="true">';
   echo '<div class="modal-dialog" role="document">';
   echo '<div class="modal-content">';
+
   echo '<div class="modal-header">';
   echo '<h5 class="modal-title" id="gameModalLabel' . $row['game_id'] . '">Update Game</h5>';
   echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
   echo '<span aria-hidden="true">&times;</span>';
   echo '</button>';
   echo '</div>';
+
   echo '<div class="modal-body">';
   echo '<form action="update_game.php" method="POST">';
   echo '<input type="hidden" name="game_id" value="' . $row['game_id'] . '">';
@@ -152,31 +204,36 @@ foreach ($results as $row) {
   echo '<label for="title">Title</label>';
   echo '<input type="text" class="form-control" name="title" value="' . $row['title'] . '">';
   echo '</div>';
+
   echo '<div class="form-group">';
   echo '<label for="unit_price">Unit Price</label>';
   echo '<input type="number" class="form-control" name="unit_price" value="' . $row['unit_price'] . '">';
   echo '</div>';
+
   echo '<div class="form-group">';
   echo '<label for="release_date">release_date</label>';
   echo '<input type="text" class="form-control" name="release_date" value="' . $row['release_date'] . '">';
   echo '</div>';
+
   echo '<div class="form-group">';
   echo '<label for="genre">genre</label>';
   echo '<input type="text" class="form-control" name="genre" value="' . $row['genre'] . '">';
   echo '</div>';
+
   echo '<button type="submit" class="btn btn-primary">Save Changes</button>';
   echo '</form>';
   echo '</div>';
+
   echo '<div class="modal-footer">';
   echo '<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>';
   echo '</div>';
+
   echo '</div>';
+  echo '</div>';
+  */
 }
 
-
 echo '</tbody></table>';
-
-
 
 
 // Include DataTables jQuery plugin and initialize the table
@@ -194,8 +251,22 @@ $(document).ready(function() {
     });
 });
 </script>';
+
+// Button Functions
+if ($_SERVER['REQUEST_METHOD'] == 'POST')
+{
+  if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "Add Game"))
+  {
+    addGame($_POST['genre'], $_POST['title'], $_POST['release_date'], $_POST['unit_price']);
+  }
+  if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "Delete"))
+  {
+    deleteGame($_POST['game_id']);
+    header("refresh:2");
+  }
+}
+
 ?>
 
-<!-- Content goes here -->
 </body>
 </html>

@@ -169,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     $auction_id = $_POST['auction_id'];
     // $uid is the userid
     deletefromCart($uid, $auction_id);
-    header("refresh:0");
+    header("refresh:2");
   }
   if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "Buy"))
   {
@@ -187,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
     // Buys all games in the shopping cart
     // "utilizes top card on top of list"
     buyGamesInCart();
-    header("refresh:0");
+    header("refresh:2");
 
   }
 }
