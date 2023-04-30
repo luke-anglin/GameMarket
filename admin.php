@@ -163,7 +163,13 @@ foreach ($results as $row) {
   echo '<td>' . $row['genre'] . '</td>';
   
   // Update Game Button
-  echo '<td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#gameModal' . $row['game_id'] . '">Update</button></td>';
+  echo '<td><form action="update_game.php" method="POST">
+  <input type="submit" name="actionBtn" value="Update" class ="btn btn-primary" />
+  <input type="hidden" name="game_id" value="' . $row['game_id'] . '" />
+  <input type="hidden" name="initial" value="1">
+  <a href="admin.php" /a>
+  </form>
+  </td>';
   // Delete Game Button
   echo '<td><form action="admin.php" method="POST">
   <input type="submit" name="actionBtn" value="Delete" class ="btn btn-danger" />
@@ -171,6 +177,8 @@ foreach ($results as $row) {
   <a href="admin.php" /a>
   </form>
   </td>';
+  echo '</tr>';
+
   echo '</tr>';
 
   /*
