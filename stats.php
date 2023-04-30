@@ -87,9 +87,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
   }
   else if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "✓"))
   {
-    addEmail($_POST['newEmail'], $u_id);
-    $email = getUserEmail($u_id);
-  }
+    if (strpos($_POST['newEmail'], '@') !== false) 
+    {
+      addEmail($_POST['newEmail'], $u_id);
+      $email = getUserEmail($u_id);
+    } 
+    else 
+    {
+      echo "Error: Email address must include '@' symbol";
+    }
+  }  
   else if (!empty($_POST['phoneBtn']) && ($_POST['phoneBtn'] == "X"))
   {
     deletePhone($_POST['delete_phone']);
@@ -97,8 +104,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
   }
   else if (!empty($_POST['phoneBtn']) && ($_POST['phoneBtn'] == "✓"))
   {
-    addPhone($_POST['newPhone'], $u_id);
-    $phone = getUserPhone($u_id);
+    $newPhone = $_POST['newPhone'];
+    if(strlen($newPhone) != 10 || !is_numeric($newPhone)) {
+      echo "Please enter a 10-digit phone number";
+    } else {
+      addPhone($newPhone, $u_id);
+      $phone = getUserPhone($u_id);
+    }
   }
   else if (!empty($_POST['ratingBtn']) && ($_POST['ratingBtn'] == "✓"))
   {
