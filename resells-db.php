@@ -1,5 +1,5 @@
 <?php
-function addAuction($auction_id, $price, $stock, $game_title)
+function addAuction($price, $stock, $game_title)
 {
     global $db;
     
@@ -7,22 +7,28 @@ function addAuction($auction_id, $price, $stock, $game_title)
     $game_id = selectGameID($game_title);
     if (!$game_id) {
         // Display error message and return
-        echo "Error: Invalid game title.";
+        $message = "Error: Invalid game title.";
+        echo "<script>alert('$message');</script>";
         return;
     }
     
     // Insert auction data into Auctions table
-    $query = "insert into Auctions values (:auction_id, :price, :stock)";
+    $query = "INSERT INTO Auctions (price, stock) VALUES (:price, :stock);";
     $statement = $db->prepare($query);
-    $statement->bindValue(':auction_id', $auction_id);
     $statement->bindValue(':price', $price);
     $statement->bindValue(':stock', $stock);
     $statement->execute();
     $statement->closeCursor();
+
+    $query = "SELECT LAST_INSERT_ID() as auction_id;";
+    $statement = $db->prepare($query);
+    $statement->execute();
+    $auction_id = $statement->fetchColumn();
+    $statement->closeCursor();
     
     // Insert data into Sells table
     addSells($_SESSION['user_id'], $auction_id);
-    
+        
     // Insert data into Sold_on table
     addSoldon($auction_id, $game_id);
 }
@@ -106,7 +112,7 @@ function deleteAuction($auction_to_delete)
 function selectAllYourSoldon($user_id)
 {
      global $db;
-     $query = "select * from Sold_on NATURAL JOIN Sells WHERE user_id=:user_id ORDER BY auction_id";
+     $query = "SELECT * FROM Sold_on NATURAL JOIN Game NATURAL JOIN Auctions NATURAL JOIN Sells WHERE user_id=:user_id ORDER BY auction_id";
      $statement = $db->prepare($query);
      $statement->bindValue(':user_id', $user_id);
      $statement->execute();

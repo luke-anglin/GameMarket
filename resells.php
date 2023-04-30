@@ -79,7 +79,7 @@ if (!isset($_SESSION['user_id'])) {
 
 require("resells-db.php");
 $user_id = $_SESSION['user_id'];
-$auction_id = getCountAuctions() + 1;
+// $auction_id = getCountAuctions() + 1;
 $auction_info_to_update = null;
 $auctions = selectAllAuctions();
 $soldon = selectAllYourSoldon($user_id);
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 {
   if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "Add Auction"))
   {
-    addAuction($auction_id, $_POST['price'], $_POST['stock'], $_POST['game']);
+    addAuction($_POST['price'], $_POST['stock'], $_POST['game']);
     $soldon = selectAllYourSoldon($user_id);
   }
   else if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "Delete"))
@@ -133,14 +133,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
       <thead>
       <tr style="background-color:#B0B0B0">
         <th>Auction ID</th>   
-        <th>Game ID</th>    
-        <th>Delete?</th>
+        <th>Game Title</th>
+        <th>Unit Price</th>  
+        <th>Selling Price</th> 
+        <th>Stock</th>   
+        <th>Remove</th>
       </tr>
       </thead>
     <?php foreach ($soldon as $item): ?>
       <tr>
         <td><?php echo $item['auction_id']; ?></td>
-        <td><?php echo $item['game_id']; ?></td>  
+        <td><?php echo $item['title']; ?></td>  
+        <td><?php echo $item['unit_price']; ?></td> 
+        <td><?php echo $item['price']; ?></td> 
+        <td><?php echo $item['stock']; ?></td> 
         <td>
           <form action="resells.php" method="post">
             <input type="submit" name="actionBtn" value="Delete" class ="btn btn-danger" />
