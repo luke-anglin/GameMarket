@@ -36,6 +36,18 @@ function getUserPhone($user_id)
     return $results;
 }
 
+function getUserPayment($user_id)
+{
+    global $db;
+    $query = "select card_type, card_number from UserPayment where user_id=:user_id"; 
+    $statement = $db->prepare($query);
+    $statement->bindValue(':user_id', $user_id);
+    $statement->execute();
+    $results = $statement->fetchAll();
+    $statement->closeCursor();
+    return $results;
+}
+
 function deleteEmail($email_to_delete)
 {
     global $db;
@@ -73,6 +85,29 @@ function addPhone($phone, $id)
     $query = "insert into UserPhone (phone_number, user_id) values (:phone, :id)"; 
     $statement = $db->prepare($query);
     $statement->bindValue(':phone', $phone);
+    $statement->bindValue(':id', $id);
+    $statement->execute();
+    $statement->closeCursor();
+}
+
+function deletePayment($cardType, $cardNumber)
+{
+    global $db;
+    $query = "DELETE FROM UserPayment where card_type=:cardType AND card_number=:cardNumber"; 
+    $statement = $db->prepare($query);
+    $statement->bindValue(':cardType', $cardType);
+    $statement->bindValue(':cardNumber', $cardNumber);
+    $statement->execute();
+    $statement->closeCursor();
+}
+
+function addPayment($type, $number, $id)
+{
+    global $db;
+    $query = "INSERT into UserPayment (card_number, card_type, user_id) values (:number, :type, :id)"; 
+    $statement = $db->prepare($query);
+    $statement->bindValue(':number', $number);
+    $statement->bindValue(':type', $type);
     $statement->bindValue(':id', $id);
     $statement->execute();
     $statement->closeCursor();
