@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $unit_price = null; 
         $stmt -> execute();
         $row = $stmt -> fetchAll(PDO::FETCH_ASSOC); 
+        $stmt -> closeCursor();
         $genre = $row[0]['genre'];
         $title = $row[0]['title'];
         $unit_price = $row[0]['unit_price'];
@@ -21,10 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bindParam(':genre', $_POST['genre']);
         $stmt->bindParam(':game_id', $_POST['game_id']);
         $stmt->execute();
-        $message = "Updating table, now the title is " . $_POST['title'] . " and the unit price is " . $_POST['unit_price'] . " and the genre is " . $_POST['genre'] . ". You will be redirected back in 8 seconds."; 
-        echo "<script>alert('$message');</script>";
-        sleep(8);
-        header("Location:admin.php"); exit;
+        $stmt -> closeCursor();
+        // $message = "Updating table, now the title is " . $_POST['title'] . " and the unit price is " . $_POST['unit_price'] . " and the genre is " . $_POST['genre'] . ". You will be redirected back in 8 seconds."; 
+        // echo "<script>alert('$message');</script>";
+        header("Location:admin.php");
+        exit;
     }
 }
 ?>
