@@ -173,7 +173,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
   }
   if (!empty($_POST['actionBtn']) && ($_POST['actionBtn'] == "Buy"))
   {
-    echo "here";
     // Check if user has a payment method on their account
     $pay = checkPayment($uid);
     foreach ($pay as $p) {
