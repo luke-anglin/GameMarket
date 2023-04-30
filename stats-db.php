@@ -152,6 +152,16 @@ function addRating($rating, $u_id, $game_id)
     $statement->closeCursor();
 }
 
+function deleteRating($u_id, $game_id)
+{
+    global $db;
+    $query = "DELETE FROM Reviews WHERE user_id = :u_id AND game_id = :game_id"; 
+    $statement = $db->prepare($query);
+    $statement->bindValue(':u_id', $u_id);
+    $statement->bindValue(':game_id', $game_id);
+    $statement->execute();
+    $statement->closeCursor();
+}
 
 function getRating($id, $game_id)
 {
